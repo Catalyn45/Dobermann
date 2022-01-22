@@ -1,0 +1,4 @@
+*.o
+dobermann
+.vscode
+test_dobermann
