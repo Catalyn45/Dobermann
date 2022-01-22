@@ -30,7 +30,7 @@ static void set_nonblocking(int sock) {
     }
 }
 
-Sniffer::Sniffer(const std::string& name)
+Sniffer::Sniffer(const char* name)
     : name(name) {
     int sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
     if (sock == -1) {

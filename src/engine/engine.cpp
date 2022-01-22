@@ -45,6 +45,11 @@ void Engine::start() {
     for (Sniffer* sniffer : sniffers) {
         sniffer->init();
         event* read_ev = event_new(this->base, sniffer->sock, EV_READ | EV_PERSIST, read_callback, sniffer);
+        if (!read_ev) {
+            logger->error("Error at creating event");
+            return;
+        }
+
         event_add(read_ev, NULL);
     }
 

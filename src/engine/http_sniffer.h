@@ -4,6 +4,9 @@
 #include "sniffer.h"
 
 class HttpSniffer : public Sniffer {
+private:
+    std::string cache_buffer;
+
 public:
     HttpSniffer();
     void read(const char* buffer, uint32_t length);

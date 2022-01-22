@@ -24,7 +24,7 @@ protected:
 public:
     void init();
     virtual void read(const char* buffer, uint32_t length) = 0;
-    Sniffer(const std::string& name);
+    Sniffer(const char* name);
     ~Sniffer();
 };
 

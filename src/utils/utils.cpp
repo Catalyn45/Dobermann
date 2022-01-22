@@ -25,7 +25,7 @@ std::string util::get_escaped_packet(const char* packet, int size) {
 
         char hexa_repr[5];
 
-        snprintf(hexa_repr, 5, "\\%02X", packet[i]);
+        snprintf(hexa_repr, 5, "\\%02X", (unsigned char)packet[i]);
         output.append(hexa_repr);
     }
 
