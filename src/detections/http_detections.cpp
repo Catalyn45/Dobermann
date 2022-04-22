@@ -1,6 +1,9 @@
 #include "http_detections.h"
 
 static bool CVE_2021_44228(HttpPacket* packet, CVE* out_cve) {
+    if (packet->type == HTTP_RESPONSE)
+        return false;
+    
     static const char* log4j_tokens[] = {"${jndi:ldap", "${jndi:dns"};
     bool detected = false;
 

@@ -86,10 +86,8 @@ static int parse_http_packet(const char* buffer, uint32_t length, HttpPacket* ou
 
 
 HttpSniffer::HttpSniffer(const std::string interface_name, uint16_t port)
-    : Sniffer("Http", std::move(interface_name), std::string("ip && tcp && ( dst port ") +
-                                                 std::to_string(port) + 
-                                                 std::string(" || src port ") + 
-                                                 std::to_string(port) + std::string(")")) {}
+    : Sniffer("Http", std::move(interface_name), std::string("ip && tcp && dst port ") +
+                                                 std::to_string(port)) {}
 
 extern http_static_detection_t http_static_detections[];
 
