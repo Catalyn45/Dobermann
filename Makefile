@@ -16,11 +16,11 @@ logging.o: src/utils/logging.h src/utils/logging.cpp
 utils.o: src/utils/utils.h src/utils/utils.cpp
 	$(CC) src/utils/utils.cpp -c -o utils.o $(COMPILER_FLAGS) $(FLAGS)
 
-sniffer.o: src/engine/sniffer.h src/engine/sniffer.cpp
-	$(CC) src/engine/sniffer.cpp -c -o sniffer.o $(COMPILER_FLAGS) $(FLAGS)
+sniffer.o: src/sniffers/sniffer.h src/sniffers/sniffer.cpp
+	$(CC) src/sniffers/sniffer.cpp -c -o sniffer.o $(COMPILER_FLAGS) $(FLAGS)
 
-http_sniffer.o: src/engine/http_sniffer.h src/engine/http_sniffer.cpp
-	$(CC) src/engine/http_sniffer.cpp -c -o http_sniffer.o $(COMPILER_FLAGS) $(FLAGS)
+http_sniffer.o: src/sniffers/http_sniffer.h src/sniffers/http_sniffer.cpp
+	$(CC) src/sniffers/http_sniffer.cpp -c -o http_sniffer.o $(COMPILER_FLAGS) $(FLAGS)
 
 http_detections.o: src/detections/http_detections.h src/detections/http_detections.cpp
 	$(CC) src/detections/http_detections.cpp -c -o http_detections.o $(COMPILER_FLAGS) $(FLAGS)

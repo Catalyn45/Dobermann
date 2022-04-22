@@ -7,14 +7,12 @@
 #include <vector>
 
 #include "engine.h"
-#include "sniffer.h"
+#include "../sniffers/sniffer.h"
 
 class Engine {
 private:
     std::vector<Sniffer*> sniffers;
     event_base* base;
-    static std::unique_ptr<Engine> engine;
-
 
 protected:
 public:

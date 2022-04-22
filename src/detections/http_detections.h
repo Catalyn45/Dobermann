@@ -1,7 +1,7 @@
 #ifndef _HTTP_DETECTIONS_H_
 #define _HTTP_DETECTIONS_H_
 
-#include "../engine/http_sniffer.h"
+#include "../sniffers/http_sniffer.h"
 #include "vulns.h"
 
 class HttpDynamicDetection {

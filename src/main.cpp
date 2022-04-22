@@ -1,8 +1,8 @@
 #include <event2/event.h>
 
 #include "engine/engine.h"
-#include "engine/http_sniffer.h"
-#include "engine/sniffer.h"
+#include "sniffers/http_sniffer.h"
+#include "sniffers/sniffer.h"
 #include "utils/logging.h"
 #include "utils/utils.h"
 #include <string.h>

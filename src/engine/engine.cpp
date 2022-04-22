@@ -1,5 +1,4 @@
 #include "engine.h"
-
 #include "../utils/logging.h"
 
 static Logger* logger = Logger::get_logger();
