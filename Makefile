@@ -1,5 +1,5 @@
-CC=gcc
-COMPILER_FLAGS=-lstdc++
+CC=clang++
+COMPILER_FLAGS= -std=c++14
 FLAGS=-g
 
 PROJ_NAME=dobermann

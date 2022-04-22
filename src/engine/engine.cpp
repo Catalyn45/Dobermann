@@ -16,16 +16,6 @@ Engine::~Engine() {
     }
 }
 
-std::unique_ptr<Engine> Engine::engine(nullptr);
-
-Engine* Engine::get_engine() {
-    if (!engine.get()) {
-        engine.reset(new Engine());
-    }
-
-    return engine.get();
-}
-
 #define BUFFER_SIZE 255
 
 static void read_callback(int socket, short what, void* arg) {
@@ -33,29 +23,39 @@ static void read_callback(int socket, short what, void* arg) {
 
     char buffer[BUFFER_SIZE];
     int res = recv(socket, buffer, sizeof(buffer), 0);
+    logger->debug("received %d bytes packet", res);
     if (res <= 0) {
         logger->error("error receiving data from socket");
         return;
     }
 
-    sniffer->read(buffer, res);
+    sniffer->on_packet(buffer, res);
 }
 
-void Engine::start() {
+int Engine::start() {
     for (Sniffer* sniffer : sniffers) {
-        sniffer->init();
+        logger->info("starting sniffer: %s", sniffer->name);
+        if(sniffer->init() != 0) {
+            logger->error("error initializing sniffer: %s", sniffer->name);
+            return 1;
+        }
+
+        logger->debug("creating event for sniffer: %s", sniffer->name);
         event* read_ev = event_new(this->base, sniffer->sock, EV_READ | EV_PERSIST, read_callback, sniffer);
         if (!read_ev) {
-            logger->error("Error at creating event");
-            return;
+            logger->error("error at creating event");
+            return 1;
         }
 
         event_add(read_ev, NULL);
     }
 
+    logger->info("all sniffers started");
     event_base_dispatch(this->base);
+    return 0;
 }
 
 void Engine::register_sniffer(Sniffer* sniffer) {
+    logger->debug("registring sniffer: %s on interface %s", sniffer->name, sniffer->interface_name);
     Engine::sniffers.push_back(sniffer);
 }

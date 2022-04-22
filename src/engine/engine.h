@@ -15,12 +15,11 @@ private:
     event_base* base;
     static std::unique_ptr<Engine> engine;
 
-    Engine();
 
 protected:
 public:
-    static Engine* get_engine();
-    void start();
+    Engine();
+    int start();
     void register_sniffer(Sniffer* sniffer);
     ~Engine();
 };
