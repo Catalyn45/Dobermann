@@ -1,6 +1,6 @@
 CC=clang++
 COMPILER_FLAGS= -std=c++14
-FLAGS=-g
+FLAGS=-g -fPIC
 
 PROJ_NAME=dobermann
 LIBS=-levent -lpcap
@@ -22,11 +22,14 @@ sniffer.o: src/engine/sniffer.h src/engine/sniffer.cpp
 http_sniffer.o: src/engine/http_sniffer.h src/engine/http_sniffer.cpp
 	$(CC) src/engine/http_sniffer.cpp -c -o http_sniffer.o $(COMPILER_FLAGS) $(FLAGS)
 
+http_detections.o: src/detections/http_detections.h src/detections/http_detections.cpp
+	$(CC) src/detections/http_detections.cpp -c -o http_detections.o $(COMPILER_FLAGS) $(FLAGS)
+
 engine.o: src/engine/engine.h src/engine/engine.cpp
 	$(CC) src/engine/engine.cpp -c -o engine.o $(COMPILER_FLAGS) $(FLAGS)
 
-dobermann: main.o logging.o utils.o sniffer.o http_sniffer.o engine.o
-	$(CC) main.o logging.o utils.o sniffer.o http_sniffer.o engine.o -o $(PROJ_NAME) $(COMPILER_FLAGS) $(LIBS)
+dobermann: main.o logging.o utils.o sniffer.o http_sniffer.o engine.o http_detections.o
+	$(CC) main.o logging.o utils.o sniffer.o http_sniffer.o engine.o http_detections.o -o $(PROJ_NAME) $(COMPILER_FLAGS) $(FLAGS) $(LIBS)
 
 test_main.o: tests/test_main.cpp
 	$(CC) tests/test_main.cpp -c -o test_main.o $(COMPILER_FLAGS) $(FLAGS)

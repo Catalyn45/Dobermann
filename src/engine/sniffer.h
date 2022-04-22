@@ -47,12 +47,12 @@ protected:
 
     static uint32_t id;
 
-    const char* name;
-    const char* interface_name;
-    std::string filter;
+    const std::string name;
+    const std::string interface_name;
+    const std::string filter;
 
 public:
-    Sniffer(const char* name, const char* interface_name, std::string filter);
+    Sniffer(const std::string name, const std::string interface_name, const std::string filter);
     int init();
     virtual void on_packet(const char* buffer, uint32_t length) = 0;
     virtual ~Sniffer();

@@ -22,13 +22,13 @@ int main(int argc, char* argv[]) {
         port = atoi(argv[2]);
     }
 
-    Logger::config(Level::DEBUG);
+    Logger::config(Level::INFO);
 
     logger->info("creating and registering http sniffer");
 
     Engine* engine = new Engine();
 
-    engine->register_sniffer(new HttpSniffer(interface, port));
+    engine->register_sniffer(new HttpSniffer(std::string(interface), port));
 
     if(engine->start() != 0) {
         logger->error("error starting engine");

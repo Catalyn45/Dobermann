@@ -8,13 +8,15 @@ enum class Level : int {
     DEBUG,
     INFO,
     WARNING,
-    ERROR
+    ERROR,
+    DETECTION
 };
 
 class Logger {
 private:
     static std::unique_ptr<Logger> logger;
     static Level log_level;
+    static bool colors;
 
     Logger();
 
@@ -23,12 +25,12 @@ protected:
 
 public:
     static Logger* get_logger();
-    static void config(Level level);
-
+    static void config(Level level, bool colors=true);
     void debug(const char* fmt, ...);
     void info(const char* fmt, ...);
     void warning(const char* fmt, ...);
     void error(const char* fmt, ...);
+    void detection(const char* fmt, ...);
 };
 
 #endif  // _LOGGING_H_

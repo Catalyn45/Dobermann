@@ -34,17 +34,17 @@ static void read_callback(int socket, short what, void* arg) {
 
 int Engine::start() {
     for (Sniffer* sniffer : sniffers) {
-        logger->info("starting sniffer: %s", sniffer->name);
+        logger->info("starting sniffer: %s", sniffer->name.c_str());
         if(sniffer->init() != 0) {
-            logger->error("error initializing sniffer: %s", sniffer->name);
-            return 1;
+            logger->error("error initializing sniffer: %s", sniffer->name.c_str());
+            return -1;
         }
 
-        logger->debug("creating event for sniffer: %s", sniffer->name);
+        logger->debug("creating event for sniffer: %s", sniffer->name.c_str());
         event* read_ev = event_new(this->base, sniffer->sock, EV_READ | EV_PERSIST, read_callback, sniffer);
         if (!read_ev) {
             logger->error("error at creating event");
-            return 1;
+            return -1;
         }
 
         event_add(read_ev, NULL);
@@ -56,6 +56,6 @@ int Engine::start() {
 }
 
 void Engine::register_sniffer(Sniffer* sniffer) {
-    logger->debug("registring sniffer: %s on interface %s", sniffer->name, sniffer->interface_name);
+    logger->debug("registring sniffer: %s on interface %s", sniffer->name.c_str(), sniffer->interface_name.c_str());
     Engine::sniffers.push_back(sniffer);
 }

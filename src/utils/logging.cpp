@@ -4,30 +4,37 @@
 #include <time.h>
 #include <sys/time.h>
 #include <string.h>
+#include <stdarg.h>
 
 Logger::Logger() {}
 
 std::unique_ptr<Logger> Logger::logger = nullptr;
 
 Level Logger::log_level = Level::ERROR;
+bool Logger::colors = true;
 
 static const char* levels[] = {
     "[DEBUG]",
     "[INFO] ",
     "[WARN] ",
-    "[ERROR]"
+    "[ERROR]",
+    "[DETEC]"
 };
 
 void Logger::log(Level level, const char* message) {
     static char buffer[26];
-    char color[10] = "\033[0;37m";
+    char color[8] = "\033[0;37m";
 
-    if (level == Level::ERROR) {
-        strcpy(color, "\033[0;31m");
-    } else if (level == Level::WARNING) {
-        strcpy(color, "\033[0;33m");
-    } else if (level == Level::DEBUG) {
-        strcpy(color, "\033[0;36m");
+    if (colors) {
+        if (level == Level::ERROR) {
+            strcpy(color, "\033[0;31m");
+        } else if (level == Level::WARNING) {
+            strcpy(color, "\033[0;33m");
+        } else if (level == Level::DEBUG) {
+            strcpy(color, "\033[0;36m");
+        } else if (level == Level::DETECTION) {
+            strcpy(color, "\033[0;35m");
+        }
     }
 
     struct timeval now;
@@ -35,7 +42,7 @@ void Logger::log(Level level, const char* message) {
     struct tm* tm = localtime(&now.tv_sec);
     strftime(buffer, 26, "%Y-%m-%d %H:%M:%S", tm);
 
-    printf("%s[%s:%ld] %s %s\n", color, buffer, now.tv_usec, levels[(int)level], message);
+    printf("%s[%s:%06ld] %s %s\n", color, buffer, now.tv_usec, levels[(int)level], message);
 }
 
 Logger* Logger::get_logger() {
@@ -46,8 +53,9 @@ Logger* Logger::get_logger() {
     return Logger::logger.get();
 }
 
-void Logger::config(Level level) {
+void Logger::config(Level level, bool colors) {
     Logger::log_level = level;
+    Logger::colors = colors;
 }
 
 #define MAX_MESSAGE_LEN 300
@@ -76,4 +84,8 @@ void Logger::warning(const char* fmt, ...) {
 
 void Logger::error(const char* fmt, ...) {
     LOG_MESSAGE(Level::ERROR);
+}
+
+void Logger::detection(const char* fmt, ...) {
+    LOG_MESSAGE(Level::DETECTION);
 }
