@@ -6,19 +6,35 @@
 #include <memory>
 #include <vector>
 
-#include "engine.h"
 #include "../sniffers/sniffer.h"
+#include "../dispatchers/dispatcher.h"
+#include "engine.h"
+
+class Sniffer;
+class Dispatcher;
 
 class Engine {
 private:
     std::vector<Sniffer*> sniffers;
+    std::vector<Dispatcher*> dispatchers;
+
     event_base* base;
+
+    void listen();
+
+    Sniffer* get_sniffer(const std::string iterface_name, const std::string name, uint16_t port);
 
 protected:
 public:
     Engine();
+    
     int start();
     void register_sniffer(Sniffer* sniffer);
+    void register_dispatcher(Dispatcher* dispatcher);
+    void dispatch(Event* event);
+
+    int config(const std::string file_path);
+
     ~Engine();
 };
 

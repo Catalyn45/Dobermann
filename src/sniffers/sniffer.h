@@ -5,6 +5,7 @@
 
 #include <string>
 #include <vector>
+#include "../engine/engine.h"
 
 enum Protocol {
     TCP,
@@ -35,24 +36,25 @@ struct Packet {
 
 int parse_packet(const char* buffer, uint32_t length, Packet* out_packet);
 
+class Engine;
+
 class Sniffer {
 private:
-    static std::vector<Sniffer*> sniffers;
     static event_base* base;
-
+    static uint32_t id;
+    
     friend class Engine;
 
 protected:
+    
+    Engine* engine;
     int sock;
-
-    static uint32_t id;
 
     const std::string name;
     const std::string interface_name;
     const std::string filter;
-
 public:
-    Sniffer(const std::string name, const std::string interface_name, const std::string filter);
+    Sniffer(Engine* engine, const std::string name, const std::string interface_name, const std::string filter);
     int init();
     virtual void on_packet(const char* buffer, uint32_t length) = 0;
     virtual ~Sniffer();

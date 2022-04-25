@@ -31,6 +31,8 @@ public:
     void warning(const char* fmt, ...);
     void error(const char* fmt, ...);
     void detection(const char* fmt, ...);
+
+    virtual ~Logger();
 };
 
 #endif  // _LOGGING_H_

@@ -9,6 +9,6 @@ public:
     virtual bool detect(HttpPacket* packet, CVE* out_cve) = 0;
 };
 
-typedef bool (*http_static_detection_t) (HttpPacket* packet, CVE* out_cve);
+typedef bool (*http_static_detection_t) (const HttpPacket* packet, CVE* out_cve);
 
 #endif  // _HTTP_DETECTIONS_H_

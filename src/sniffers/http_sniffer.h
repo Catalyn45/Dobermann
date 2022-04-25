@@ -29,7 +29,7 @@ private:
 protected:
     void on_packet(const char* buffer, uint32_t length);
 public:
-    HttpSniffer(const std::string interface_name, uint16_t port);
+    HttpSniffer(Engine* engine, const std::string interface_name, uint16_t port);
 };
 
 #endif  // _HTTP_SNIFFER_H_

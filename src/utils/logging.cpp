@@ -7,6 +7,7 @@
 #include <stdarg.h>
 
 Logger::Logger() {}
+Logger::~Logger() {}
 
 std::unique_ptr<Logger> Logger::logger = nullptr;
 

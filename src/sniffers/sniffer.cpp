@@ -23,9 +23,7 @@ static Logger* logger = Logger::get_logger();
 
 using namespace util;
 
-
 uint32_t Sniffer::id{0};
-std::vector<Sniffer*> Sniffer::sniffers{};
 
 int parse_packet(const char* buffer, uint32_t length, Packet* out_packet) {
     if (length < sizeof(struct ether_header)) {
@@ -115,8 +113,8 @@ static void set_nonblocking(int sock) {
     }
 }
 
-Sniffer::Sniffer(const std::string name, const std::string interface_name, const std::string filter)
-    : name(name), interface_name(interface_name), filter(filter), sock(-1) {}
+Sniffer::Sniffer(Engine* engine, const std::string name, const std::string interface_name, const std::string filter)
+    : engine(engine), sock(-1), name(name), interface_name(interface_name), filter(filter) {}
 
 int Sniffer::init() {
     logger->debug("creating socket for sniffer: %s", this->name.c_str());

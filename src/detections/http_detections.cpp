@@ -1,6 +1,6 @@
 #include "http_detections.h"
 
-static bool CVE_2021_44228(HttpPacket* packet, CVE* out_cve) {
+static bool CVE_2021_44228(const HttpPacket* packet, CVE* out_cve) {
     if (packet->type == HTTP_RESPONSE)
         return false;
     
@@ -18,7 +18,7 @@ static bool CVE_2021_44228(HttpPacket* packet, CVE* out_cve) {
             break;
         }
 
-        for (auto& header : packet->headers) {
+        for (const auto& header : packet->headers) {
             if (header.second.find(token) != std::string::npos) {
                 detected = true;
                 break;

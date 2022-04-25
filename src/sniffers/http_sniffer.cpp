@@ -85,8 +85,8 @@ static int parse_http_packet(const char* buffer, uint32_t length, HttpPacket* ou
 }
 
 
-HttpSniffer::HttpSniffer(const std::string interface_name, uint16_t port)
-    : Sniffer("Http", std::move(interface_name), std::string("ip && tcp && dst port ") +
+HttpSniffer::HttpSniffer(Engine* engine, const std::string interface_name, uint16_t port)
+    : Sniffer(engine, "Http", std::move(interface_name), std::string("ip && tcp && dst port ") +
                                                  std::to_string(port)) {}
 
 extern http_static_detection_t http_static_detections[];
@@ -103,6 +103,6 @@ void HttpSniffer::on_packet(const char* buffer, uint32_t length) {
             continue;
         }
 
-        logger->detection("http exploit for: %s, type: %s, score: %.1f", cve.id.c_str(), cve.type.c_str(), cve.score);
+        this->engine->dispatch(&cve);
     }
 }
