@@ -17,6 +17,8 @@
 #include <linux/tcp.h>
 #include <linux/udp.h>
 
+#include <event2/event.h>
+
 
 static Logger* logger = Logger::get_logger();
 
@@ -114,7 +116,21 @@ static void set_nonblocking(int sock) {
 }
 
 Sniffer::Sniffer(Engine* engine, const std::string name, const std::string interface_name, const std::string filter)
-    : engine(engine), sock(-1), name(name), interface_name(interface_name), filter(filter) {}
+    : engine(engine), sock(-1), event(nullptr), name(name), interface_name(interface_name), filter(filter) {}
+
+static void read_callback(int socket, short what, void* arg) {
+    Sniffer* sniffer = (Sniffer*)arg;
+
+    char buffer[BUFFER_SIZE];
+    int res = recv(socket, buffer, sizeof(buffer), 0);
+    logger->debug("received %d bytes packet", res);
+    if (res <= 0) {
+        logger->error("error receiving data from socket");
+        return;
+    }
+
+    sniffer->on_packet(buffer, res);
+}
 
 int Sniffer::init() {
     logger->debug("creating socket for sniffer: %s", this->name.c_str());
@@ -161,6 +177,7 @@ int Sniffer::init() {
 
     logger->debug("activating pcap handle on sniffer: %s", this->name.c_str());
     if (pcap_activate(pc) != 0) {
+        pcap_close(pc);
         logger->error("error at pcap activation");
         return -1;
     }
@@ -169,6 +186,7 @@ int Sniffer::init() {
 
     logger->debug("compiling \"%s\" filter for sniifer %s", this->filter.c_str(), this->name.c_str());
     if (pcap_compile(pc, &program, this->filter.c_str(), 1, 0) != 0) {
+        pcap_close(pc);
         logger->error("error at pcap compile");
         return -1;
     }
@@ -181,6 +199,7 @@ int Sniffer::init() {
     logger->debug("setting filter on sniffer: %s", this->name.c_str());
     res = setsockopt(sock, SOL_SOCKET, SO_ATTACH_FILTER, &kernel_filter, sizeof(kernel_filter));
     pcap_freecode(&program);
+    pcap_close(pc);
 
     if (res != 0) {
         logger->error("fail to attach filter: %s", get_system_error());
@@ -192,13 +211,33 @@ int Sniffer::init() {
     logger->debug("draining socket on sniffer: %s", this->name.c_str());
     while (recv(sock, buff, sizeof(buff), 0) != -1);
 
+    logger->debug("creating event for sniffer: %s", this->name.c_str());
+    struct event* read_ev = event_new(this->engine->base, sock, EV_READ | EV_PERSIST, read_callback, this);
+    if (!read_ev) {
+        logger->error("error at creating event");
+        return -1;
+    }
+
     p_sock.release();
     this->sock = sock;
-
+    this->event = read_ev;
     return 0;
 }
 
+int Sniffer::start() {
+    return event_add(this->event, NULL);
+}
+
+void Sniffer::stop() {
+    event_del(this->event);
+}
+
 Sniffer::~Sniffer() {
-    if(this->sock != -1)
+    if (this->event) {
+        event_free(this->event);
+    }
+
+    if(this->sock != -1) {
         close(this->sock);
+    }
 }

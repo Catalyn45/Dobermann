@@ -26,6 +26,8 @@ protected:
 public:
     static Logger* get_logger();
     static void config(Level level, bool colors=true);
+    static Level level_name(const std::string level);
+
     void debug(const char* fmt, ...);
     void info(const char* fmt, ...);
     void warning(const char* fmt, ...);

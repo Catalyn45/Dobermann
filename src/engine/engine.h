@@ -17,17 +17,17 @@ class Engine {
 private:
     std::vector<Sniffer*> sniffers;
     std::vector<Dispatcher*> dispatchers;
-
-    event_base* base;
-
-    void listen();
+    int settings_sock;
+    struct event* settings_event;
+    int listen();
 
     Sniffer* get_sniffer(const std::string iterface_name, const std::string name, uint16_t port);
 
 protected:
 public:
-    Engine();
+    event_base* base;
     
+    Engine();
     int start();
     void register_sniffer(Sniffer* sniffer);
     void register_dispatcher(Dispatcher* dispatcher);

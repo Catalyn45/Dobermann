@@ -49,6 +49,7 @@ protected:
     
     Engine* engine;
     int sock;
+    struct event* event;
 
     const std::string name;
     const std::string interface_name;
@@ -56,6 +57,8 @@ protected:
 public:
     Sniffer(Engine* engine, const std::string name, const std::string interface_name, const std::string filter);
     int init();
+    int start();
+    void stop();
     virtual void on_packet(const char* buffer, uint32_t length) = 0;
     virtual ~Sniffer();
 };

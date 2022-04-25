@@ -13,6 +13,8 @@ class Dispatcher {
 
         Dispatcher(Engine* engine, const std::string name);
         virtual void dispatch(Event* event) = 0;
+
+        virtual ~Dispatcher();
     protected:
     private:
 };

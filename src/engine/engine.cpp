@@ -3,37 +3,38 @@
 #include "nlohmann/json.hpp"
 #include <fstream>
 #include "../sniffers/http_sniffer.h"
+#include <sys/un.h>
+#include <unistd.h>
+#include "../utils/utils.h"
+#include "../dispatchers/json_dispatcher.h"
 
 using json = nlohmann::json;
 
 static Logger* logger = Logger::get_logger();
 
-Engine::Engine() {
+Engine::Engine()
+    : settings_sock(-1), settings_event(nullptr) {
     this->base = event_base_new();
 }
 
 Engine::~Engine() {
-    event_base_free(this->base);
-
     for (Sniffer* sniffer : this->sniffers) {
         delete sniffer;
     }
-}
 
-#define BUFFER_SIZE 255
-
-static void read_callback(int socket, short what, void* arg) {
-    Sniffer* sniffer = (Sniffer*)arg;
-
-    char buffer[BUFFER_SIZE];
-    int res = recv(socket, buffer, sizeof(buffer), 0);
-    logger->debug("received %d bytes packet", res);
-    if (res <= 0) {
-        logger->error("error receiving data from socket");
-        return;
+    for (Dispatcher* dispatcher : this->dispatchers) {
+        delete dispatcher;
     }
 
-    sniffer->on_packet(buffer, res);
+    if (this->settings_event != nullptr) {
+        event_free(this->settings_event);
+    }
+
+    if (this->settings_sock != -1) {
+        close(this->settings_sock);
+    }
+
+    event_base_free(this->base);
 }
 
 int Engine::start() {
@@ -44,17 +45,16 @@ int Engine::start() {
             return -1;
         }
 
-        logger->debug("creating event for sniffer: %s", sniffer->name.c_str());
-        event* read_ev = event_new(this->base, sniffer->sock, EV_READ | EV_PERSIST, read_callback, sniffer);
-        if (!read_ev) {
-            logger->error("error at creating event");
+        if(sniffer->start() != 0) {
+            logger->error("error starting sniffer: %s", sniffer->name.c_str());
             return -1;
         }
-
-        event_add(read_ev, NULL);
     }
 
     logger->info("all sniffers started");
+
+    this->listen();
+    
     event_base_dispatch(this->base);
     return 0;
 }
@@ -96,7 +96,10 @@ int Engine::config(const std::string file_path) {
     json config;
     file >> config;
 
-    for (const auto& config_item: config) {
+    const std::string dispatch_path = config["dispatch"];
+    this->register_dispatcher(new JsonDispatcher(this, dispatch_path));
+
+    for (const auto& config_item: config["configs"]) {
         auto interfaces = config_item["interfaces"];
         auto sniffers = config_item["sniffers"];
 
@@ -115,7 +118,86 @@ int Engine::config(const std::string file_path) {
                 this->register_sniffer(sniffer_obj);
             }
         }
+    }    
+
+    return 0;
+}
+
+static void setting_callback(int socket, short what, void* arg) {
+    Engine *engine = (Engine*)arg;
+
+    char buffer[BUFFER_SIZE];
+    int res = recv(socket, buffer, sizeof(buffer) - 1, 0);
+    if (res <= 0) {
+        logger->error("error receiving data from socket");
+        return;
     }
 
+    buffer[res] = '\0';
+    logger->info("receivied message: %s", buffer);
+}
+
+static void accept_callback(int socket, short what, void* arg) {
+    Engine *engine = (Engine*)arg;
+
+    int client = accept(socket, NULL, NULL);
+    if (client < 0) {
+        logger->error("error accepting connection");
+        return;
+    }
+    logger->info("accepted connection");
+
+    event* setting_ev = event_new(engine->base, client, EV_READ | EV_PERSIST, setting_callback, engine);
+    if(!setting_ev) {
+        logger->error("error at creating event");
+        return;
+    }
+
+    if(event_add(setting_ev, NULL) < 0) {
+        logger->error("error at creating event");
+        return;
+    }
+}
+
+int Engine::listen() {
+    int sock = socket(AF_UNIX, SOCK_STREAM, 0);
+    if (sock < 0) {
+        logger->error("error creating socket");
+        return -1;
+    }
+
+    util::descriptor_ptr sock_ptr(&sock);
+
+    struct sockaddr_un addr;
+    addr.sun_family = AF_UNIX;
+
+    strcpy(addr.sun_path, "./sniffer");
+
+    unlink("./sniffer");
+    if (bind(sock, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
+        logger->error("error binding socket");
+        return -1;
+    }
+
+    if (::listen(sock, 5) < 0) {
+        logger->error("error listening socket");
+        return -1;
+    }
+
+    event* accept_ev = event_new(this->base, sock, EV_READ | EV_PERSIST, accept_callback, this);
+    if (!accept_ev) {
+        logger->error("error at creating event");
+        return -1;
+    }
+
+    if(event_add(accept_ev, NULL) < 0) {
+        event_del(accept_ev);
+        logger->error("error at adding event");
+        return -1;
+    }
+
+    sock_ptr.release();
+    this->settings_sock = sock;
+    this->settings_event = accept_ev;
     return 0;
 }

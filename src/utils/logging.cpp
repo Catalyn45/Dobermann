@@ -9,7 +9,7 @@
 Logger::Logger() {}
 Logger::~Logger() {}
 
-std::unique_ptr<Logger> Logger::logger = nullptr;
+std::unique_ptr<Logger> Logger::logger(nullptr);
 
 Level Logger::log_level = Level::ERROR;
 bool Logger::colors = true;
@@ -48,7 +48,7 @@ void Logger::log(Level level, const char* message) {
 
 Logger* Logger::get_logger() {
     if (!Logger::logger.get()) {
-        Logger::logger.reset(new Logger());
+        Logger::logger = std::unique_ptr<Logger>(new Logger());
     }
 
     return Logger::logger.get();
@@ -57,6 +57,20 @@ Logger* Logger::get_logger() {
 void Logger::config(Level level, bool colors) {
     Logger::log_level = level;
     Logger::colors = colors;
+}
+
+Level Logger::level_name(const std::string level) {
+    if (level == "DEBUG") {
+        return Level::DEBUG;
+    } else if (level == "INFO") {
+        return Level::INFO;
+    } else if (level == "WARNING") {
+        return Level::WARNING;
+    } else if (level == "DETECTION") {
+        return Level::DETECTION;
+    }
+
+    return Level::ERROR;
 }
 
 #define MAX_MESSAGE_LEN 300

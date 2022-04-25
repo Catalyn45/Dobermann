@@ -4,6 +4,8 @@
 #include <memory>
 #include <string>
 
+#define BUFFER_SIZE 255
+
 namespace util {
 
 struct descriptor_deleter {
