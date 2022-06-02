@@ -99,10 +99,8 @@ void HttpSniffer::on_packet(const char* buffer, uint32_t length) {
 
     CVE cve;
     for(int i = 0; http_static_detections[i] != NULL; i++) {
-        if(!http_static_detections[i](&packet, &cve)) {
-            continue;
+        if(http_static_detections[i](&packet, &cve)) {
+            this->engine->dispatch(&cve);
         }
-
-        this->engine->dispatch(&cve);
     }
 }

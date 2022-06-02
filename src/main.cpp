@@ -50,7 +50,6 @@ int main(int argc, char* argv[]) {
     // engine->register_dispatcher(new JsonDispatcher(engine, "json_dispatcher.json"));
 
     engine->config("config.json");
-
     if(engine->start() != 0) {
         logger->error("error starting engine");
         return -1;
