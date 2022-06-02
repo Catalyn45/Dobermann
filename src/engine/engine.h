@@ -19,14 +19,13 @@ private:
     std::vector<Dispatcher*> dispatchers;
     int settings_sock;
     struct event* settings_event;
-    int listen();
 
     Sniffer* get_sniffer(const std::string iterface_name, const std::string name, uint16_t port);
 
 protected:
 public:
     event_base* base;
-    
+
     Engine();
     int start();
     void register_sniffer(Sniffer* sniffer);

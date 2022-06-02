@@ -53,8 +53,6 @@ int Engine::start() {
 
     logger->info("all sniffers started");
 
-    this->listen();
-    
     event_base_dispatch(this->base);
     return 0;
 }
@@ -118,86 +116,7 @@ int Engine::config(const std::string file_path) {
                 this->register_sniffer(sniffer_obj);
             }
         }
-    }    
-
-    return 0;
-}
-
-static void setting_callback(int socket, short what, void* arg) {
-    Engine *engine = (Engine*)arg;
-
-    char buffer[BUFFER_SIZE];
-    int res = recv(socket, buffer, sizeof(buffer) - 1, 0);
-    if (res <= 0) {
-        logger->error("error receiving data from socket");
-        return;
     }
 
-    buffer[res] = '\0';
-    logger->info("receivied message: %s", buffer);
-}
-
-static void accept_callback(int socket, short what, void* arg) {
-    Engine *engine = (Engine*)arg;
-
-    int client = accept(socket, NULL, NULL);
-    if (client < 0) {
-        logger->error("error accepting connection");
-        return;
-    }
-    logger->info("accepted connection");
-
-    event* setting_ev = event_new(engine->base, client, EV_READ | EV_PERSIST, setting_callback, engine);
-    if(!setting_ev) {
-        logger->error("error at creating event");
-        return;
-    }
-
-    if(event_add(setting_ev, NULL) < 0) {
-        logger->error("error at creating event");
-        return;
-    }
-}
-
-int Engine::listen() {
-    int sock = socket(AF_UNIX, SOCK_STREAM, 0);
-    if (sock < 0) {
-        logger->error("error creating socket");
-        return -1;
-    }
-
-    util::descriptor_ptr sock_ptr(&sock);
-
-    struct sockaddr_un addr;
-    addr.sun_family = AF_UNIX;
-
-    strcpy(addr.sun_path, "./sniffer");
-
-    unlink("./sniffer");
-    if (bind(sock, (struct sockaddr*)&addr, sizeof(addr)) < 0) {
-        logger->error("error binding socket");
-        return -1;
-    }
-
-    if (::listen(sock, 5) < 0) {
-        logger->error("error listening socket");
-        return -1;
-    }
-
-    event* accept_ev = event_new(this->base, sock, EV_READ | EV_PERSIST, accept_callback, this);
-    if (!accept_ev) {
-        logger->error("error at creating event");
-        return -1;
-    }
-
-    if(event_add(accept_ev, NULL) < 0) {
-        event_del(accept_ev);
-        logger->error("error at adding event");
-        return -1;
-    }
-
-    sock_ptr.release();
-    this->settings_sock = sock;
-    this->settings_event = accept_ev;
     return 0;
 }
