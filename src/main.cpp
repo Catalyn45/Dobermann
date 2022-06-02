@@ -12,7 +12,6 @@
 #include <signal.h>
 
 static Logger* logger = Logger::get_logger();
-
 using namespace util;
 
 struct event *signal_event = nullptr;
@@ -20,7 +19,7 @@ struct event *signal_event = nullptr;
 static void exit_handler(int socket, short what, void* arg) {
     logger->info("exiting...");
     auto engine = (std::unique_ptr<Engine>*)arg;
-    
+
     if (signal_event != nullptr)
         event_free(signal_event);
 
@@ -45,9 +44,6 @@ int main(int argc, char* argv[]) {
         logger->error("error creating signal event");
         return -1;
     }
-
-    // engine->register_sniffer(new HttpSniffer(engine, interface, port));
-    // engine->register_dispatcher(new JsonDispatcher(engine, "json_dispatcher.json"));
 
     engine->config("config.json");
     if(engine->start() != 0) {

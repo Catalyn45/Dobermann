@@ -10,7 +10,7 @@ JsonDispatcher::JsonDispatcher(Engine* engine, const std::string path)
 
 void JsonDispatcher::dispatch(Event* event) {
     json j = event->serialize();
-    logger->detection(j.dump(4).c_str());
+    logger->detection(std::string(j["id"]).c_str());
     // std::ofstream f(path);
     // f << j << std::endl;
 }

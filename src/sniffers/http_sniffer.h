@@ -3,6 +3,7 @@
 
 #include "sniffer.h"
 #include <map>
+#include <string>
 
 enum HttpPacketType {
     HTTP_REQUEST,

@@ -42,11 +42,11 @@ class Sniffer {
 private:
     static event_base* base;
     static uint32_t id;
-    
+
     friend class Engine;
 
 protected:
-    
+
     Engine* engine;
     int sock;
     struct event* event;

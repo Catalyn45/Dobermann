@@ -19,7 +19,6 @@
 
 #include <event2/event.h>
 
-
 static Logger* logger = Logger::get_logger();
 
 
@@ -122,7 +121,20 @@ static void read_callback(int socket, short what, void* arg) {
     Sniffer* sniffer = (Sniffer*)arg;
 
     char buffer[BUFFER_SIZE];
-    int res = recv(socket, buffer, sizeof(buffer), 0);
+
+    struct sockaddr_ll addr;
+    socklen_t addr_len = sizeof(addr);
+    int res = recvfrom(socket, buffer, sizeof(buffer), 0, (struct sockaddr*)&addr, &addr_len);
+    if (res < 0) {
+        logger->error("Error reading from socket");
+        return;
+    }
+
+    if (addr.sll_pkttype == PACKET_OUTGOING) {
+        logger->debug("Packet is outgoing");
+        return;
+    }
+
     logger->debug("received %d bytes packet", res);
     if (res <= 0) {
         logger->error("error receiving data from socket");
@@ -150,7 +162,7 @@ int Sniffer::init() {
         logger->error("error getting interface index: %s", get_system_error());
         return -1;
     }
-    
+
     logger->debug("interface: %s have index: %d", this->interface_name.c_str(), interface_index);
 
     struct sockaddr_ll saddrll = {
