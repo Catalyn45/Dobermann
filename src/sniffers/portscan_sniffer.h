@@ -1,3 +1,6 @@
+#ifndef PORTSCAN_SNIFFER_H_
+#define PORTSCAN_SNIFFER_H_
+
 #include "sniffer.h"
 #include <map>
 #include <utility>
@@ -12,3 +15,5 @@ public:
     PortScanSniffer(Engine* engine, const std::string interface_name);
     void on_packet(const char* buffer, uint32_t length);
 };
+
+#endif // PORTSCAN_SNIFFER_H_
