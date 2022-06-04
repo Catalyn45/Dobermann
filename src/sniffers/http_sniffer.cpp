@@ -18,18 +18,7 @@ static const std::regex http_response_regex("^HTTP/1\\.[01] (\\d+) (.*)\r\n");
 
 static const std::regex header_regex("^([^:]+): (.*)\r\n");
 
-static int parse_http_packet(const char* buffer, uint32_t length, HttpPacket* out_packet) {
-    Packet packet;
-    if (parse_packet(buffer, length, &packet) != 0) {
-        logger->debug("error parsing packet");
-        return -1;
-    }
-
-    if (packet.protocol != Protocol::TCP) {
-        logger->debug("packet is not tcp");
-        return -1;
-    }
-
+static int parse_http_packet(Packet* packet, HttpPacket* out_packet) {
     std::smatch match;
 
     HttpPacketType type;
@@ -40,11 +29,11 @@ static int parse_http_packet(const char* buffer, uint32_t length, HttpPacket* ou
     std::string status;
     std::string reason;
 
-    if (std::regex_search(packet.payload, match, http_request_regex)) {
+    if (std::regex_search(packet->payload, match, http_request_regex)) {
         type = HttpPacketType::HTTP_REQUEST;
         method = match[1].str();
         path = match[2].str();
-    } else if (std::regex_search(packet.payload, match, http_response_regex)) {
+    } else if (std::regex_search(packet->payload, match, http_response_regex)) {
         type = HttpPacketType::HTTP_RESPONSE;
         status = match[1].str();
         reason = match[2].str();
@@ -55,20 +44,20 @@ static int parse_http_packet(const char* buffer, uint32_t length, HttpPacket* ou
 
     auto headers = std::map<std::string, std::string>();
 
-    std::string paylaod = packet.payload;
+    std::string paylaod = packet->payload;
 
     while(std::regex_search(paylaod, match, header_regex)) {
         headers[match[1].str()] = match[2].str();
         paylaod = match.suffix().str();
     }
 
-    size_t body_start = packet.payload.find("\r\n\r\n");
+    size_t body_start = packet->payload.find("\r\n\r\n");
     if (body_start == std::string::npos) {
         logger->debug("body not found, packet is not http");
         return -1;
     }
 
-    std::string body = packet.payload.substr(body_start + 4);
+    std::string body = packet->payload.substr(body_start + 4);
 
     out_packet->type = std::move(type);
 
@@ -92,14 +81,26 @@ HttpSniffer::HttpSniffer(Engine* engine, const std::string interface_name, uint1
 extern http_static_detection_t http_static_detections[];
 
 void HttpSniffer::on_packet(const char* buffer, uint32_t length) {
-    HttpPacket packet;
-    if(parse_http_packet(buffer, length, &packet) != 0) {
+    Packet packet;
+    if (parse_packet(buffer, length, &packet) != 0) {
+        logger->debug("error parsing packet");
         return;
     }
 
-    CVE cve("127.0.0.1");
+    if (packet.protocol != Protocol::TCP) {
+        logger->debug("packet is not tcp");
+        return;
+    }
+
+    HttpPacket http_packet;
+    if(parse_http_packet(&packet, &http_packet) != 0) {
+        logger->debug("error parsing http packet");
+        return;
+    }
+
+    CVE cve(packet.source_ip);
     for(int i = 0; http_static_detections[i] != NULL; i++) {
-        if(http_static_detections[i](&packet, &cve)) {
+        if(http_static_detections[i](&http_packet, &cve)) {
             this->engine->dispatch(&cve);
         }
     }

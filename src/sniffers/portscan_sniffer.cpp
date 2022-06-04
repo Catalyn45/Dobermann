@@ -38,7 +38,7 @@ void PortScanSniffer::on_packet(const char* buffer, uint32_t length) {
     if (ports.size() > PORT_SCAN_THRESHOLD) {
         ports.clear();
         logger->info("port scan detected");
-        Portscan portscan("127.0.0.1");
+        Portscan portscan(packet.source_ip);
         this->engine->dispatch(&portscan);
     }
 }

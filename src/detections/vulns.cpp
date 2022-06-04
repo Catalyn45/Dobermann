@@ -18,7 +18,7 @@ json CVE::serialize() {
 }
 
 Portscan::Portscan(std::string ip)
-    : Event(EventType::SCAN, ip) {}
+    : Event(EventType::PORT_SCAN, ip) {}
 
 json Portscan::serialize() {
     json j;

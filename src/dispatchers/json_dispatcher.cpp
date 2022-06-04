@@ -13,9 +13,7 @@ JsonDispatcher::JsonDispatcher(Engine* engine, const std::string path)
 
 void JsonDispatcher::dispatch(Event* event) {
     json j_event = event->serialize();
-
-
-    logger->detection("detection for ip: %s",event->ip.c_str());
+    logger->detection("detection type: %s from ip: %s",event->type_to_string().c_str(), event->ip.c_str());
 
     std::ofstream tmp(this->path, std::ios::app);
     tmp.close();

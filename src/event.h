@@ -7,6 +7,7 @@ using json = nlohmann::json;
 enum EventType {
     EXPLOIT,
     ATTACK,
+    PORT_SCAN,
     SCAN,
     SPOOF
 };
@@ -17,6 +18,8 @@ class Event {
         EventType type;
         std::string ip;
         virtual json serialize() = 0;
+
+        std::string type_to_string();
     private:
     protected:
 };
