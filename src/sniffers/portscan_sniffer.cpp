@@ -31,14 +31,16 @@ void PortScanSniffer::on_packet(const char* buffer, uint32_t length) {
 
     ports[packet.source_ip][packet.dest_port] = time(NULL);
 
-    for (auto ip = ports.begin(); ip != ports.end();) {
-        for (auto it = ip->second.begin(); it != ip->second.end();) {
+    for (auto& ip : ports) {
+        for (auto it = ip.second.begin(); it != ip.second.end();) {
             if ((time(NULL) - it->second) > PORT_SCAN_TIMEOUT_THRESHOLD) {
-                ip->second.erase(it++);
+                ip.second.erase(it++);
             } else {
                 it++;
             }
         }
+
+        ports[ip.first] = ip.second;
     }
 
     if (ports[packet.source_ip].size() > PORT_SCAN_THRESHOLD) {
