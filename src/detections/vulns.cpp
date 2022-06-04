@@ -25,3 +25,12 @@ json Portscan::serialize() {
     j["description"] = "Portscan attempted";
     return j;
 }
+
+Flood::Flood(std::string ip)
+    : Event(EventType::FLOOD, ip) {}
+
+json Flood::serialize() {
+    json j;
+    j["description"] = "Flood attempted";
+    return j;
+}

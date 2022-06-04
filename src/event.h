@@ -8,6 +8,7 @@ enum EventType {
     EXPLOIT,
     ATTACK,
     PORT_SCAN,
+    FLOOD,
     SCAN,
     SPOOF
 };

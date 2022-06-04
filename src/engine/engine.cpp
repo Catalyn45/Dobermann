@@ -4,6 +4,7 @@
 #include <fstream>
 #include "../sniffers/http_sniffer.h"
 #include "../sniffers/portscan_sniffer.h"
+#include "../sniffers/flood_sniffer.h"
 #include <sys/un.h>
 #include <unistd.h>
 #include "../utils/utils.h"
@@ -82,6 +83,10 @@ Sniffer* Engine::get_sniffer(const std::string interface_name, const std::string
 
     if (name == "portscan") {
         return new PortScanSniffer(this, interface_name);
+    }
+
+    if (name == "flood") {
+        return new FloodSniffer(this, interface_name, port);
     }
 
     return nullptr;

@@ -1,7 +1,8 @@
 #include "sniffer.h"
 #include <map>
+#include <utility>
 
-using ports_t = std::map<uint16_t, uint32_t>;
+using ports_t = std::map<std::string, std::map<uint32_t, long>>;
 
 class PortScanSniffer : public Sniffer {
 private:

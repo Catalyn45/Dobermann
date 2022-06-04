@@ -29,4 +29,13 @@ struct Portscan: public Event {
     json serialize();
 };
 
+struct Flood: public Event {
+    Flood(std::string ip);
+
+    Flood(const Flood& other) = default;
+    Flood(Flood&& other) = default;
+
+    json serialize();
+};
+
 #endif // _VULNS_H_

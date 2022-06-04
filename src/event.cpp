@@ -11,6 +11,8 @@ std::string Event::type_to_string() {
             return std::string("Attack");
         case EventType::PORT_SCAN:
             return std::string("Portscan");
+        case EventType::FLOOD:
+            return std::string("Flood");
         case EventType::SCAN:
             return std::string("Scan");
         case EventType::SPOOF:

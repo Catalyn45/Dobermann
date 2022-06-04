@@ -2,14 +2,15 @@
 #include "../utils/logging.h"
 #include "../utils/utils.h"
 #include "../detections/vulns.h"
+#include <utility>
 
-Logger *logger = Logger::get_logger();
+static Logger *logger = Logger::get_logger();
 
 
 ports_t PortScanSniffer::ports;
 
 PortScanSniffer::PortScanSniffer(Engine* engine, const std::string interface_name)
-    : Sniffer(engine, "Portscan", interface_name, std::string("tcp[tcpflags] & (tcp-syn|tcp-ack) != 0")) {}
+    : Sniffer(engine, "Portscan", interface_name, std::string("(tcp[tcpflags] & (tcp-syn) != 0) && (tcp[tcpflags] & (tcp-ack) == 0)")) {}
 
 
 #define PORT_SCAN_THRESHOLD 100
@@ -24,19 +25,25 @@ void PortScanSniffer::on_packet(const char* buffer, uint32_t length) {
         logger->debug("packet is not tcp");
         return;
     }
+    if (ports.find(packet.source_ip) == ports.end()) {
+        ports[packet.source_ip] = std::map<uint32_t, long>();
+    }
 
-    ports[packet.dest_port] = time(NULL);
+    ports[packet.source_ip][packet.dest_port] = time(NULL);
 
-    for (auto it = ports.begin(); it != ports.end();) {
-        if (it->second < time(NULL) - PORT_SCAN_TIMEOUT_THRESHOLD) {
-            ports.erase(it++);
-        } else {
-            it++;
+    for (auto ip = ports.begin(); ip != ports.end();) {
+        for (auto it = ip->second.begin(); it != ip->second.end();) {
+            if ((time(NULL) - it->second) > PORT_SCAN_TIMEOUT_THRESHOLD) {
+                ip->second.erase(it++);
+            } else {
+                it++;
+            }
         }
     }
 
-    if (ports.size() > PORT_SCAN_THRESHOLD) {
-        ports.clear();
+    if (ports[packet.source_ip].size() > PORT_SCAN_THRESHOLD) {
+        logger->info("size: %d", ports.size());
+        ports[packet.source_ip].clear();
         logger->info("port scan detected");
         Portscan portscan(packet.source_ip);
         this->engine->dispatch(&portscan);
