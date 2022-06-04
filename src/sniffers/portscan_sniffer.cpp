@@ -44,7 +44,6 @@ void PortScanSniffer::on_packet(const char* buffer, uint32_t length) {
     }
 
     if (ports[packet.source_ip].size() > PORT_SCAN_THRESHOLD) {
-        logger->info("size: %d", ports.size());
         ports[packet.source_ip].clear();
         logger->info("port scan detected");
         Portscan portscan(packet.source_ip);
