@@ -13,8 +13,9 @@ enum EventType {
 
 class Event {
     public:
-        Event(EventType type);
+        Event(EventType type, std::string ip);
         EventType type;
+        std::string ip;
         virtual json serialize() = 0;
     private:
     protected:

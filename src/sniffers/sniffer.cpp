@@ -194,6 +194,12 @@ int Sniffer::init() {
         return -1;
     }
 
+    if(pcap_setdirection(pc, PCAP_D_IN) != 0) {
+        pcap_close(pc);
+        logger->error("error at pcap set direction");
+        return -1;
+    }
+
     bpf_program program;
 
     logger->debug("compiling \"%s\" filter for sniifer %s", this->filter.c_str(), this->name.c_str());

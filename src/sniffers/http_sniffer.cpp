@@ -54,7 +54,7 @@ static int parse_http_packet(const char* buffer, uint32_t length, HttpPacket* ou
     }
 
     auto headers = std::map<std::string, std::string>();
-    
+
     std::string paylaod = packet.payload;
 
     while(std::regex_search(paylaod, match, header_regex)) {
@@ -97,7 +97,7 @@ void HttpSniffer::on_packet(const char* buffer, uint32_t length) {
         return;
     }
 
-    CVE cve;
+    CVE cve("127.0.0.1");
     for(int i = 0; http_static_detections[i] != NULL; i++) {
         if(http_static_detections[i](&packet, &cve)) {
             this->engine->dispatch(&cve);

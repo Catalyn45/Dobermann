@@ -34,14 +34,17 @@ sniffer.o: src/sniffers/sniffer.h src/sniffers/sniffer.cpp
 http_sniffer.o: src/sniffers/http_sniffer.h src/sniffers/http_sniffer.cpp
 	$(CC) src/sniffers/http_sniffer.cpp -c -o http_sniffer.o $(COMPILER_FLAGS) $(FLAGS)
 
+portscan_sniffer.o: src/sniffers/portscan_sniffer.h src/sniffers/portscan_sniffer.cpp
+	$(CC) src/sniffers/portscan_sniffer.cpp -c -o portscan_sniffer.o $(COMPILER_FLAGS) $(FLAGS)
+
 http_detections.o: src/detections/http_detections.h src/detections/http_detections.cpp
 	$(CC) src/detections/http_detections.cpp -c -o http_detections.o $(COMPILER_FLAGS) $(FLAGS)
 
 engine.o: src/engine/engine.h src/engine/engine.cpp
 	$(CC) src/engine/engine.cpp -c -o engine.o $(COMPILER_FLAGS) $(FLAGS)
 
-dobermann: main.o logging.o utils.o sniffer.o http_sniffer.o engine.o http_detections.o dispatcher.o json_dispatcher.o event.o vulns.o
-	$(CC) main.o logging.o utils.o sniffer.o http_sniffer.o engine.o http_detections.o dispatcher.o json_dispatcher.o event.o vulns.o -o $(PROJ_NAME) $(COMPILER_FLAGS) $(FLAGS) $(LIBS)
+dobermann: main.o logging.o utils.o sniffer.o http_sniffer.o engine.o http_detections.o dispatcher.o json_dispatcher.o event.o vulns.o portscan_sniffer.o
+	$(CC) main.o logging.o utils.o sniffer.o http_sniffer.o portscan_sniffer.o engine.o http_detections.o dispatcher.o json_dispatcher.o event.o vulns.o -o $(PROJ_NAME) $(COMPILER_FLAGS) $(FLAGS) $(LIBS)
 
 test_main.o: tests/test_main.cpp
 	$(CC) tests/test_main.cpp -c -o test_main.o $(COMPILER_FLAGS) $(FLAGS)

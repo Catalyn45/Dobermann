@@ -1,4 +1,4 @@
 #include "event.h"
 
-Event::Event(EventType event_type):
-    type(event_type) {}
+Event::Event(EventType event_type, std::string src_ip):
+    type(event_type), ip(src_ip) {}

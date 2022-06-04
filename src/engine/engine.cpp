@@ -3,6 +3,7 @@
 #include "nlohmann/json.hpp"
 #include <fstream>
 #include "../sniffers/http_sniffer.h"
+#include "../sniffers/portscan_sniffer.h"
 #include <sys/un.h>
 #include <unistd.h>
 #include "../utils/utils.h"
@@ -79,6 +80,10 @@ Sniffer* Engine::get_sniffer(const std::string interface_name, const std::string
         return new HttpSniffer(this, interface_name, port);
     }
 
+    if (name == "portscan") {
+        return new PortScanSniffer(this, interface_name);
+    }
+
     return nullptr;
 }
 
@@ -105,7 +110,11 @@ int Engine::config(const std::string file_path) {
 
             for (const auto& sniffer: sniffers) {
                 std::string name = sniffer["name"];
-                uint16_t port = sniffer["port"];
+
+                uint16_t port = 0;
+                if (sniffer.find("port") != sniffer.end()) {
+                    port = sniffer["port"];
+                }
 
                 Sniffer* sniffer_obj = this->get_sniffer(interface, name, port);
                 if (sniffer_obj == nullptr) {
