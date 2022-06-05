@@ -2,20 +2,18 @@
 
 #include <fcntl.h>
 #include <linux/filter.h>
-#include <linux/if_packet.h>
-#include <net/ethernet.h>
 #include <net/if.h>
 #include <pcap.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/socket.h>
 #include <unistd.h>
+#include <linux/if_packet.h>
+#include <linux/ip.h>
+#include <net/ethernet.h>
 
 #include "../utils/logging.h"
 #include "../utils/utils.h"
-#include <linux/ip.h>
-#include <linux/tcp.h>
-#include <linux/udp.h>
 
 #include <event2/event.h>
 
@@ -25,85 +23,6 @@ static Logger* logger = Logger::get_logger();
 using namespace util;
 
 uint32_t Sniffer::id{0};
-
-int parse_packet(const char* buffer, uint32_t length, Packet* out_packet) {
-    if (length < sizeof(struct ether_header)) {
-        return -1;
-    }
-
-    struct ether_header* eth_header = (struct ether_header*) buffer;
-    char addr[40];
-
-    sprintf(addr, "%02x:%02x:%02x:%02x:%02x:%02x",
-            eth_header->ether_shost[0],
-            eth_header->ether_shost[1],
-            eth_header->ether_shost[2],
-            eth_header->ether_shost[3],
-            eth_header->ether_shost[4],
-            eth_header->ether_shost[5]);
-    out_packet->source_mac = std::string(addr);
-
-    sprintf(addr, "%02x:%02x:%02x:%02x:%02x:%02x",
-            eth_header->ether_dhost[0],
-            eth_header->ether_dhost[1],
-            eth_header->ether_dhost[2],
-            eth_header->ether_dhost[3],
-            eth_header->ether_dhost[4],
-            eth_header->ether_dhost[5]);
-    out_packet->dest_mac = std::string(addr);
-
-    if (ntohs(eth_header->ether_type) != ETHERTYPE_IP) {
-        logger->debug("ether type not supported");
-        return -1;
-    }
-
-    uint32_t offset = sizeof(struct ether_header);
-
-    if (length < offset + sizeof(struct iphdr)) {
-        return -1;
-    }
-
-    struct iphdr* ip_header = (struct iphdr*) (buffer + offset);
-
-    inet_ntop(AF_INET, (void*)(&ip_header->saddr), addr, sizeof(addr));
-    out_packet->source_ip = std::string(addr);
-
-    inet_ntop(AF_INET, (void*)(&ip_header->daddr), addr, sizeof(addr));
-    out_packet->dest_ip = std::string(addr);
-
-    offset += sizeof(iphdr);
-    if (ip_header->protocol == IPPROTO_TCP) {
-        if (length < offset + sizeof(struct tcphdr)) {
-            return -1;
-        }
-
-        struct tcphdr* tcp_header = (struct tcphdr*) (buffer + offset);
-        out_packet->source_port = ntohs(tcp_header->source);
-        out_packet->dest_port = ntohs(tcp_header->dest);
-        out_packet->protocol = Protocol::TCP;
-
-        offset += (tcp_header->doff * sizeof(uint32_t));
-        out_packet->payload = std::string (buffer + offset, buffer + length);
-
-    } else if (ip_header->protocol == IPPROTO_UDP) {
-        if (length < offset + sizeof(struct udphdr)) {
-            return -1;
-        }
-
-        struct udphdr* udp_header = (struct udphdr*) (buffer + offset);
-        out_packet->source_port = ntohs(udp_header->source);
-        out_packet->dest_port = ntohs(udp_header->dest);
-        out_packet->protocol = Protocol::UDP;
-
-        offset += sizeof(udphdr);
-        out_packet->payload = std::string(buffer + offset, buffer + length);
-    } else {
-        logger->debug("Protocol not supported");
-        return -1;
-    }
-
-    return 0;
-}
 
 static void set_nonblocking(int sock) {
     int flags;

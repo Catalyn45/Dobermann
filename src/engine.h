@@ -6,9 +6,10 @@
 #include <memory>
 #include <vector>
 
-#include "../sniffers/sniffer.h"
-#include "../dispatchers/dispatcher.h"
+#include "sniffers/sniffer.h"
+#include "dispatchers/dispatcher.h"
 #include "engine.h"
+#include "interpreter/vm.h"
 
 class Sniffer;
 class Dispatcher;
@@ -17,6 +18,7 @@ class Engine {
 private:
     std::vector<Sniffer*> sniffers;
     std::vector<Dispatcher*> dispatchers;
+
     int settings_sock;
     struct event* settings_event;
 
@@ -25,6 +27,7 @@ private:
 protected:
 public:
     event_base* base;
+    VirtualMachine vm;
 
     Engine();
     int start();
@@ -33,6 +36,7 @@ public:
     void dispatch(Event* event);
 
     int config(const std::string file_path);
+
 
     ~Engine();
 };

@@ -8,81 +8,28 @@
 
 #include "../utils/logging.h"
 #include "../utils/utils.h"
-#include "../detections/http_detections.h"
-#include <regex>
+#include "../repositories/local_repository.h"
 
 static Logger* logger = Logger::get_logger();
 
-static const std::regex http_request_regex("^(GET|POST|PUT|DELETE|HEAD) (.*) HTTP/1\\.[01]\r\n");
-static const std::regex http_response_regex("^HTTP/1\\.[01] (\\d+) (.*)\r\n");
-
-static const std::regex header_regex("^([^:]+): (.*)\r\n");
-
-static int parse_http_packet(Packet* packet, HttpPacket* out_packet) {
-    std::smatch match;
-
-    HttpPacketType type;
-
-    std::string method;
-    std::string path;
-
-    std::string status;
-    std::string reason;
-
-    if (std::regex_search(packet->payload, match, http_request_regex)) {
-        type = HttpPacketType::HTTP_REQUEST;
-        method = match[1].str();
-        path = match[2].str();
-    } else if (std::regex_search(packet->payload, match, http_response_regex)) {
-        type = HttpPacketType::HTTP_RESPONSE;
-        status = match[1].str();
-        reason = match[2].str();
-    } else {
-        logger->debug("packet is not http");
-        return -1;
-    }
-
-    auto headers = std::map<std::string, std::string>();
-
-    std::string paylaod = packet->payload;
-
-    while(std::regex_search(paylaod, match, header_regex)) {
-        headers[match[1].str()] = match[2].str();
-        paylaod = match.suffix().str();
-    }
-
-    size_t body_start = packet->payload.find("\r\n\r\n");
-    if (body_start == std::string::npos) {
-        logger->debug("body not found, packet is not http");
-        return -1;
-    }
-
-    std::string body = packet->payload.substr(body_start + 4);
-
-    out_packet->type = std::move(type);
-
-    out_packet->method = std::move(method);
-    out_packet->path = std::move(path);
-
-    out_packet->status = std::move(status);
-    out_packet->reason = std::move(reason);
-
-    out_packet->headers = std::move(headers);
-    out_packet->body = std::move(body);
-
-    return 0;
-}
-
-
 HttpSniffer::HttpSniffer(Engine* engine, const std::string interface_name, uint16_t port)
     : Sniffer(engine, "Http", std::move(interface_name), std::string("ip && tcp && dst port ") +
-                                                 std::to_string(port)) {}
+                                                 std::to_string(port)) {
+    this->repository = new LocalRepository("./http_scripts.json");
+}
 
-extern http_static_detection_t http_static_detections[];
+HttpSniffer::~HttpSniffer() {
+    delete this->repository;
+}
+
+int HttpSniffer::init() {
+    this->scripts = this->repository->get_http_scripts();
+    return Sniffer::init();
+}
 
 void HttpSniffer::on_packet(const char* buffer, uint32_t length) {
     Packet packet;
-    if (parse_packet(buffer, length, &packet) != 0) {
+    if (util::parse_packet(buffer, length, &packet) != 0) {
         logger->debug("error parsing packet");
         return;
     }
@@ -93,15 +40,23 @@ void HttpSniffer::on_packet(const char* buffer, uint32_t length) {
     }
 
     HttpPacket http_packet;
-    if(parse_http_packet(&packet, &http_packet) != 0) {
+    if(util::parse_http_packet(&packet, &http_packet) != 0) {
         logger->debug("error parsing http packet");
         return;
     }
 
-    CVE cve(packet.source_ip);
-    for(int i = 0; http_static_detections[i] != NULL; i++) {
-        if(http_static_detections[i](&http_packet, &cve)) {
-            this->engine->dispatch(&cve);
+    logger->info("http packet: %s", http_packet.path.c_str());
+
+    vm_args_t script_args = {
+        {"packet", &http_packet}
+    };
+
+    for (auto& script : this->scripts) {
+        Event* event = this->engine->vm.run_script(script, script_args);
+        if (event != nullptr) {
+            event->ip = packet.source_ip;
+            this->engine->dispatch(event);
+            delete event;
         }
     }
 }

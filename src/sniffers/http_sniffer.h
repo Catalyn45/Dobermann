@@ -4,33 +4,18 @@
 #include "sniffer.h"
 #include <map>
 #include <string>
-
-enum HttpPacketType {
-    HTTP_REQUEST,
-    HTTP_RESPONSE
-};
-
-struct HttpPacket {
-    HttpPacketType type;
-
-    std::string method;
-    std::string path;
-
-    std::string status;
-    std::string reason;
-
-    std::map<std::string, std::string> headers;
-    std::string body;
-};
+#include "../repositories/repository.h"
 
 class HttpSniffer : public Sniffer {
 private:
-    std::string cache_buffer;
-
+    Repository *repository;
+    json scripts;
 protected:
     void on_packet(const char* buffer, uint32_t length);
+    int init();
 public:
     HttpSniffer(Engine* engine, const std::string interface_name, uint16_t port);
+    ~HttpSniffer();
 };
 
 #endif  // _HTTP_SNIFFER_H_

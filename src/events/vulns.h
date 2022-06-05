@@ -2,14 +2,16 @@
 #define _VULNS_H_
 
 #include <string>
-#include "../event.h"
+#include "event.h"
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
 
 struct CVE: public Event{
-    CVE(std::string ip, std::string id, std::string type, float score);
+    CVE();
     CVE(std::string ip);
+    CVE(std::string ip, std::string id, std::string type, float score);
+    CVE(std::string id, std::string type, float score);
     CVE(const CVE& other) = default;
     CVE(CVE&& other) = default;
 
@@ -21,6 +23,7 @@ struct CVE: public Event{
 };
 
 struct Portscan: public Event {
+    Portscan();
     Portscan(std::string ip);
 
     Portscan(const Portscan& other) = default;
@@ -30,6 +33,7 @@ struct Portscan: public Event {
 };
 
 struct Flood: public Event {
+    Flood();
     Flood(std::string ip);
 
     Flood(const Flood& other) = default;

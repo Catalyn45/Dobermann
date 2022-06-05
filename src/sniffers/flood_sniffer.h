@@ -1,3 +1,6 @@
+#ifndef FLOOD_SNIFFER_H_
+#define FLOOD_SNIFFER_H_
+
 #include "sniffer.h"
 #include <map>
 
@@ -16,3 +19,5 @@ public:
     FloodSniffer(Engine* engine, const std::string interface_name, uint16_t port);
     void on_packet(const char* buffer, uint32_t length);
 };
+
+#endif // FLOOD_SNIFFER_H_

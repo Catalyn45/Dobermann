@@ -2,7 +2,7 @@
 #define _JSON_DISPATCHER_H_
 #include <string>
 #include "dispatcher.h"
-#include "../engine/engine.h"
+#include "../engine.h"
 
 class JsonDispatcher : public Dispatcher {
     const std::string path;

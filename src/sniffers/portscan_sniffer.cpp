@@ -1,7 +1,7 @@
 #include "portscan_sniffer.h"
 #include "../utils/logging.h"
 #include "../utils/utils.h"
-#include "../detections/vulns.h"
+#include "../events/vulns.h"
 #include <utility>
 
 static Logger *logger = Logger::get_logger();
@@ -19,7 +19,7 @@ PortScanSniffer::PortScanSniffer(Engine* engine, const std::string interface_nam
 
 void PortScanSniffer::on_packet(const char* buffer, uint32_t length) {
     Packet packet;
-    parse_packet(buffer, length, &packet);
+    util::parse_packet(buffer, length, &packet);
 
     if (packet.protocol != TCP ) {
         logger->debug("packet is not tcp");
@@ -45,7 +45,6 @@ void PortScanSniffer::on_packet(const char* buffer, uint32_t length) {
 
     if (ports[packet.source_ip].size() > PORT_SCAN_THRESHOLD) {
         ports[packet.source_ip].clear();
-        logger->info("port scan detected");
         Portscan portscan(packet.source_ip);
         this->engine->dispatch(&portscan);
     }
