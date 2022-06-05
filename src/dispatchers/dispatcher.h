@@ -1,8 +1,8 @@
 #ifndef _DISPATCHER_H_
 #define _DISPATCHER_H_
 
-#include "../event.h"
-#include "../engine/engine.h"
+#include "../events/event.h"
+#include "../engine.h"
 
 class Engine;
 

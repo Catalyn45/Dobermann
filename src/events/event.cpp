@@ -3,6 +3,9 @@
 Event::Event(EventType event_type, std::string src_ip):
     type(event_type), ip(src_ip) {}
 
+Event::Event(EventType event_type):
+    type(event_type) {}
+
 std::string Event::type_to_string() {
     switch (this->type) {
         case EventType::EXPLOIT:

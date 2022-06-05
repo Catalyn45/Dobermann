@@ -1,22 +1,25 @@
 #include "engine.h"
-#include "../utils/logging.h"
+#include "utils/logging.h"
 #include "nlohmann/json.hpp"
 #include <fstream>
-#include "../sniffers/http_sniffer.h"
-#include "../sniffers/portscan_sniffer.h"
-#include "../sniffers/flood_sniffer.h"
+#include "sniffers/http_sniffer.h"
+#include "sniffers/portscan_sniffer.h"
+#include "sniffers/flood_sniffer.h"
 #include <sys/un.h>
 #include <unistd.h>
-#include "../utils/utils.h"
-#include "../dispatchers/json_dispatcher.h"
+#include "utils/utils.h"
+#include "dispatchers/json_dispatcher.h"
 
 using json = nlohmann::json;
 
 static Logger* logger = Logger::get_logger();
 
+extern vm_functions_t http_functions_map;
+
 Engine::Engine()
-    : settings_sock(-1), settings_event(nullptr) {
+    : settings_sock(-1), settings_event(nullptr), vm() {
     this->base = event_base_new();
+    this->vm.register_functions(http_functions_map);
 }
 
 Engine::~Engine() {
