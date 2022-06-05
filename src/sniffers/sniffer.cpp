@@ -19,10 +19,7 @@
 
 static Logger* logger = Logger::get_logger();
 
-
 using namespace util;
-
-uint32_t Sniffer::id{0};
 
 static void set_nonblocking(int sock) {
     int flags;
@@ -37,6 +34,7 @@ Sniffer::Sniffer(Engine* engine, const std::string name, const std::string inter
     : engine(engine), sock(-1), event(nullptr), name(name), interface_name(interface_name), filter(filter) {}
 
 static void read_callback(int socket, short what, void* arg) {
+    (void)what;
     Sniffer* sniffer = (Sniffer*)arg;
 
     char buffer[BUFFER_SIZE];
@@ -96,8 +94,6 @@ int Sniffer::init() {
         logger->error("error binding the socket address: %s", get_system_error());
         return -1;
     }
-
-    ++id;
 
     logger->debug("creating pcap handle for sniffer: %s", this->name.c_str());
     pcap_t* pc = pcap_create(this->interface_name.c_str(), NULL);

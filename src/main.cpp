@@ -17,6 +17,9 @@ using namespace util;
 struct event *signal_event = nullptr;
 
 static void exit_handler(int socket, short what, void* arg) {
+    (void)socket;
+    (void)what;
+
     logger->info("exiting...");
     auto engine = (std::unique_ptr<Engine>*)arg;
 
@@ -27,10 +30,7 @@ static void exit_handler(int socket, short what, void* arg) {
     exit(0);
 }
 
-int main(int argc, char* argv[]) {
-    const char* interface = "lo";
-    uint32_t port = 80;
-
+int main() {
     const char* log_level = getenv("LOG_LEVEL");
     if (log_level != nullptr) {
         Logger::config(Logger::level_name(log_level));

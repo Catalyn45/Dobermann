@@ -19,12 +19,16 @@ PortScanSniffer::PortScanSniffer(Engine* engine, const std::string interface_nam
 
 void PortScanSniffer::on_packet(const char* buffer, uint32_t length) {
     Packet packet;
-    util::parse_packet(buffer, length, &packet);
+    if(util::parse_packet(buffer, length, &packet) != 0) {
+        logger->error("Failed to parse packet");
+        return;
+    }
 
     if (packet.protocol != TCP ) {
         logger->debug("packet is not tcp");
         return;
     }
+
     if (ports.find(packet.source_ip) == ports.end()) {
         ports[packet.source_ip] = std::map<uint32_t, long>();
     }

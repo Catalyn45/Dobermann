@@ -1,8 +1,7 @@
 PROJNAME=dobermann
 
 CC=clang++
-CFLAGS=-std=c++14 -fPIC -ggdb -O0 -Wall -Wextra -Werror \
--Wno-unused-parameter -Wno-unused-variable -Wno-unused-function -Wno-unused-private-field
+CFLAGS=-std=c++14 -fPIC -ggdb -O0 -Wall -Wextra -Werror -Winline
 
 LIBS=-levent -lpcap
 

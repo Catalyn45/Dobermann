@@ -12,8 +12,6 @@ class Engine;
 class Sniffer {
 private:
     static event_base* base;
-    static uint32_t id;
-
     friend class Engine;
 
 protected:

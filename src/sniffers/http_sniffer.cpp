@@ -45,13 +45,12 @@ void HttpSniffer::on_packet(const char* buffer, uint32_t length) {
         return;
     }
 
-    logger->info("http packet: %s", http_packet.path.c_str());
-
     vm_args_t script_args = {
         {"packet", &http_packet}
     };
 
     for (auto& script : this->scripts) {
+        logger->debug("running scripts");
         Event* event = this->engine->vm.run_script(script, script_args);
         if (event != nullptr) {
             event->ip = packet.source_ip;
