@@ -85,7 +85,11 @@ int Sniffer::init() {
     struct sockaddr_ll saddrll = {
         .sll_family = AF_PACKET,
         .sll_protocol = htons(ETH_P_ALL),
-        .sll_ifindex = interface_index
+        .sll_ifindex = interface_index,
+        .sll_hatype = 0,
+        .sll_pkttype = 0,
+        .sll_halen = 0,
+        .sll_addr = {0, 0, 0, 0, 0, 0},
     };
 
     logger->debug("binding socket to interface on sniffer: %s", this->name.c_str());
