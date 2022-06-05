@@ -28,6 +28,7 @@ public:
     virtual int init();
     int start();
     void stop();
+    static Sniffer* from_name(Engine* engine, const std::string iterface_name, const std::string name, uint16_t port);
     virtual void on_packet(const char* buffer, uint32_t length) = 0;
     virtual ~Sniffer();
 };

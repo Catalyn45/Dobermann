@@ -19,8 +19,6 @@ private:
     std::vector<Sniffer*> sniffers;
     std::vector<Dispatcher*> dispatchers;
 
-    Sniffer* get_sniffer(const std::string iterface_name, const std::string name, uint16_t port);
-
 protected:
 public:
     event_base* base;

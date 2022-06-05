@@ -23,6 +23,8 @@ class Event {
         virtual json serialize() = 0;
 
         std::string type_to_string();
+
+        static Event* from_json(std::string type, json data);
     private:
     protected:
 };

@@ -5,6 +5,7 @@
 #include <map>
 #include <string>
 #include "../repositories/repository.h"
+#include "../engine.h"
 
 class HttpSniffer : public Sniffer {
 private:

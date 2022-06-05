@@ -1,6 +1,7 @@
 #ifndef FLOOD_SNIFFER_H_
 #define FLOOD_SNIFFER_H_
 
+#include "../engine.h"
 #include "sniffer.h"
 #include <map>
 

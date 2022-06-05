@@ -1,4 +1,8 @@
 #include "event.h"
+#include "../utils/logging.h"
+#include "vulns.h"
+
+static Logger *logger = Logger::get_logger();
 
 Event::Event(EventType event_type, std::string src_ip):
     type(event_type), ip(src_ip) {}
@@ -23,4 +27,13 @@ std::string Event::type_to_string() {
         default:
             return std::string("Unknown");
     }
+}
+
+Event* Event::from_json(std::string type, json data) {
+    if (type == "CVE") {
+        return new CVE(data["id"], data["type"], data["score"]);
+    }
+
+    logger->error("unknown event type: %s", type.c_str());
+    return nullptr;
 }

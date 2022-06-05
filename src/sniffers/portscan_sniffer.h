@@ -4,6 +4,7 @@
 #include "sniffer.h"
 #include <map>
 #include <utility>
+#include "../engine.h"
 
 using ports_t = std::map<std::string, std::map<uint32_t, long>>;
 

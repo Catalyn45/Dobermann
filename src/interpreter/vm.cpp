@@ -35,15 +35,6 @@ InstructionResult VirtualMachine::run_instruction(json instruction, vm_args_t& s
     return ERROR;
 }
 
-static Event* json_to_event(std::string type, json data) {
-    if (type == "CVE") {
-        return new CVE(data["id"], data["type"], data["score"]);
-    }
-
-    logger->error("unknown event type: %s", type.c_str());
-    return nullptr;
-}
-
 Event* VirtualMachine::run_script(json script, vm_args_t& args) {
     std::string name = script["name"];
     std::string version = script["version"];
@@ -70,7 +61,7 @@ Event* VirtualMachine::run_script(json script, vm_args_t& args) {
 
         if (result == SCRIPT_FINISHED) {
             logger->debug("script: %s matched", name.c_str());
-            return json_to_event(type, result_event);
+            return Event::from_json(type, result_event);
         }
     }
 

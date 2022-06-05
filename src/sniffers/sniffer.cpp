@@ -16,6 +16,9 @@
 #include "../utils/utils.h"
 
 #include <event2/event.h>
+#include "http_sniffer.h"
+#include "portscan_sniffer.h"
+#include "flood_sniffer.h"
 
 static Logger* logger = Logger::get_logger();
 
@@ -167,6 +170,22 @@ int Sniffer::start() {
 
 void Sniffer::stop() {
     event_del(this->event);
+}
+
+Sniffer* Sniffer::from_name(Engine* engine, const std::string interface_name, const std::string name, uint16_t port) {
+    if (name == "http") {
+        return new HttpSniffer(engine, interface_name, port);
+    }
+
+    if (name == "portscan") {
+        return new PortScanSniffer(engine, interface_name);
+    }
+
+    if (name == "flood") {
+        return new FloodSniffer(engine, interface_name, port);
+    }
+
+    return nullptr;
 }
 
 Sniffer::~Sniffer() {

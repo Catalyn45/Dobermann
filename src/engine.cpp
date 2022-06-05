@@ -71,22 +71,6 @@ void Engine::dispatch(Event* event) {
     }
 }
 
-Sniffer* Engine::get_sniffer(const std::string interface_name, const std::string name, uint16_t port) {
-    if (name == "http") {
-        return new HttpSniffer(this, interface_name, port);
-    }
-
-    if (name == "portscan") {
-        return new PortScanSniffer(this, interface_name);
-    }
-
-    if (name == "flood") {
-        return new FloodSniffer(this, interface_name, port);
-    }
-
-    return nullptr;
-}
-
 int Engine::config(const std::string file_path) {
     logger->info("configuring engine");
 
@@ -116,7 +100,7 @@ int Engine::config(const std::string file_path) {
                     port = sniffer["port"];
                 }
 
-                Sniffer* sniffer_obj = this->get_sniffer(interface, name, port);
+                Sniffer* sniffer_obj = Sniffer::from_name(this, interface, name, port);
                 if (sniffer_obj == nullptr) {
                     logger->error("error creating sniffer: %s", name.c_str());
                     return -1;
