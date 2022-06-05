@@ -20,7 +20,7 @@ PortScanSniffer::PortScanSniffer(const Engine* engine, const std::string& interf
 void PortScanSniffer::on_packet(const char* buffer, uint32_t length) {
     Packet packet;
     if(util::parse_packet(buffer, length, &packet) != 0) {
-        logger->error("Failed to parse packet");
+        logger->debug("Failed to parse packet");
         return;
     }
 

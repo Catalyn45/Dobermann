@@ -24,6 +24,7 @@ HttpSniffer::~HttpSniffer() {
 
 int HttpSniffer::init() {
     this->scripts = this->repository->get_http_scripts();
+    logger->debug("loaded %d http scripts", this->scripts.size());
     return Sniffer::init();
 }
 

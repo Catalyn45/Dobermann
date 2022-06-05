@@ -15,6 +15,7 @@ static Logger *logger = Logger::get_logger();
 void FloodSniffer::on_packet(const char* buffer, uint32_t length) {
     Packet packet;
     if (util::parse_packet(buffer, length, &packet) != 0) {
+        logger->debug("Failed to parse packet");
         return;
     }
 
