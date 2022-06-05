@@ -2,13 +2,15 @@
 #include <curl/curl.h>
 #include "logging.h"
 #include <nlohmann/json.hpp>
+#include <iostream>
 
 using json = nlohmann::json;
 
 static Logger* logger = Logger::get_logger();
 
 static size_t write_data(void *ptr, size_t size, size_t nmemb, void *stream) {
-    ((std::string*)stream)->append((char*)ptr, size * nmemb);
+    std::string* data = (std::string*)stream;
+    data->append((char*)ptr, size * nmemb);
     return size * nmemb;
 }
 
@@ -40,7 +42,7 @@ json request::get(std::string url, const std::map<std::string, std::string>& par
         return json();
     }
 
-    return json(response);
+    return json::parse(response);
 }
 
 json request::post(const std::string& url, const json& data) {
@@ -70,5 +72,5 @@ json request::post(const std::string& url, const json& data) {
         return json();
     }
 
-    return json(response);
+    return json::parse(response);
 }

@@ -9,23 +9,19 @@
 #include "../utils/logging.h"
 #include "../utils/utils.h"
 #include "../repositories/local_repository.h"
+#include "../repositories/remote_repository.h"
 
 static Logger* logger = Logger::get_logger();
 
 HttpSniffer::HttpSniffer(const Engine* engine, const std::string& interface_name, uint16_t port)
     : Sniffer(engine, "Http", interface_name, std::string("ip && tcp && dst port ") +
                                                  std::to_string(port)) {
-    this->repository = new LocalRepository("./http_scripts.json");
+    // this->repository = new LocalRepository("./http_scripts.json");
+    this->repository = new RemoteRepository("http://localhost:3000/scripts");
 }
 
 HttpSniffer::~HttpSniffer() {
     delete this->repository;
-}
-
-int HttpSniffer::init() {
-    this->scripts = this->repository->get_http_scripts();
-    logger->debug("loaded %d http scripts", this->scripts.size());
-    return Sniffer::init();
 }
 
 void HttpSniffer::on_packet(const char* buffer, uint32_t length) {
@@ -50,7 +46,9 @@ void HttpSniffer::on_packet(const char* buffer, uint32_t length) {
         {"packet", &http_packet}
     };
 
-    for (auto& script : this->scripts) {
+    json scripts = this->repository->get_http_scripts();
+
+    for (auto& script : scripts) {
         logger->debug("running scripts");
         Event* event = this->engine->vm.run_script(script, script_args);
         if (event != nullptr) {
