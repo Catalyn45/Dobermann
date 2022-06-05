@@ -4,13 +4,13 @@
 
 static Logger *logger = Logger::get_logger();
 
-Event::Event(EventType event_type, std::string src_ip):
+Event::Event(EventType event_type, const std::string& src_ip):
     type(event_type), ip(src_ip) {}
 
 Event::Event(EventType event_type):
     type(event_type) {}
 
-std::string Event::type_to_string() {
+std::string Event::type_to_string() const {
     switch (this->type) {
         case EventType::EXPLOIT:
             return std::string("Exploit");
@@ -29,7 +29,7 @@ std::string Event::type_to_string() {
     }
 }
 
-Event* Event::from_json(std::string type, json data) {
+Event* Event::from_json(const std::string& type, const json& data) {
     if (type == "CVE") {
         return new CVE(data["id"], data["type"], data["score"]);
     }

@@ -13,7 +13,7 @@ private:
     static ports_t ports;
 protected:
 public:
-    PortScanSniffer(Engine* engine, const std::string interface_name);
+    PortScanSniffer(const Engine* engine, const std::string& interface_name);
     void on_packet(const char* buffer, uint32_t length);
 };
 

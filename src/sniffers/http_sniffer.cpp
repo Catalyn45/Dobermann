@@ -12,8 +12,8 @@
 
 static Logger* logger = Logger::get_logger();
 
-HttpSniffer::HttpSniffer(Engine* engine, const std::string interface_name, uint16_t port)
-    : Sniffer(engine, "Http", std::move(interface_name), std::string("ip && tcp && dst port ") +
+HttpSniffer::HttpSniffer(const Engine* engine, const std::string& interface_name, uint16_t port)
+    : Sniffer(engine, "Http", interface_name, std::string("ip && tcp && dst port ") +
                                                  std::to_string(port)) {
     this->repository = new LocalRepository("./http_scripts.json");
 }

@@ -5,16 +5,16 @@
 CVE::CVE()
     : Event(EventType::EXPLOIT), id(), type(), score() {}
 
-CVE::CVE(std::string ip)
+CVE::CVE(const std::string& ip)
     : Event(EventType::EXPLOIT, ip), id(), type(), score() {}
 
-CVE::CVE(std::string ip, std::string id, std::string type, float score)
+CVE::CVE(const std::string& ip, const std::string& id, const std::string& type, float score)
     : Event(EventType::EXPLOIT, ip), id(id), type(type), score(score) {}
 
-CVE::CVE(std::string id, std::string type, float score)
+CVE::CVE(const std::string& id, const std::string& type, float score)
     : Event(EventType::EXPLOIT), id(id), type(type), score(score) {}
 
-json CVE::serialize() {
+json CVE::serialize() const {
     json j;
     j["id"] = id;
     j["type"] = type;
@@ -25,10 +25,10 @@ json CVE::serialize() {
 Portscan::Portscan()
     : Event(EventType::PORT_SCAN) {}
 
-Portscan::Portscan(std::string ip)
+Portscan::Portscan(const std::string& ip)
     : Event(EventType::PORT_SCAN, ip) {}
 
-json Portscan::serialize() {
+json Portscan::serialize() const {
     json j;
     j["description"] = "Portscan attempted";
     return j;
@@ -37,10 +37,10 @@ json Portscan::serialize() {
 Flood::Flood()
     : Event(EventType::FLOOD) {}
 
-Flood::Flood(std::string ip)
+Flood::Flood(const std::string& ip)
     : Event(EventType::FLOOD, ip) {}
 
-json Flood::serialize() {
+json Flood::serialize() const {
     json j;
     j["description"] = "Flood attempted";
     return j;

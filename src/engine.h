@@ -28,9 +28,9 @@ public:
     int start();
     void register_sniffer(Sniffer* sniffer);
     void register_dispatcher(Dispatcher* dispatcher);
-    void dispatch(Event* event);
+    void dispatch(Event* event) const;
 
-    int config(const std::string file_path);
+    int config(const std::string& file_path);
 
 
     ~Engine();

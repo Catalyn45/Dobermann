@@ -7,8 +7,8 @@
 class JsonDispatcher : public Dispatcher {
     const std::string path;
 public:
-    JsonDispatcher(Engine* engine, const std::string path);
-    void dispatch(Event* event);
+    JsonDispatcher(const Engine* engine, const std::string& path);
+    void dispatch(const Event* event) const;
 };
 
 #endif // _JSON_DISPATCHER_H_

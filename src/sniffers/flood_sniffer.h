@@ -17,7 +17,7 @@ private:
     syn_ips_t syn_ips;
 protected:
 public:
-    FloodSniffer(Engine* engine, const std::string interface_name, uint16_t port);
+    FloodSniffer(const Engine* engine, const std::string& interface_name, uint16_t port);
     void on_packet(const char* buffer, uint32_t length);
 };
 

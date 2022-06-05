@@ -8,22 +8,22 @@ VirtualMachine::~VirtualMachine() {}
 
 static Logger* logger = Logger::get_logger();
 
-int VirtualMachine::register_functions(vm_functions_t functions) {
-    this->functions = functions;
+int VirtualMachine::register_functions(const vm_functions_t* functions) {
+    this->functions = functions ;
     return 0;
 }
 
-InstructionResult VirtualMachine::run_instruction(json instruction, vm_args_t& script_args, json* result) {
+InstructionResult VirtualMachine::run_instruction(const json& instruction, const vm_args_t& script_args, json* result) const {
     if(instruction.find("function_pass") != instruction.end()) {
         std::string function_name = instruction["function_pass"];
         json args = instruction["args"];
 
-        if (this->functions.find(function_name) == this->functions.end()) {
+        if (this->functions->find(function_name) == this->functions->end()) {
             logger->error("function: %s not found", function_name.c_str());
             return ERROR;
         }
 
-        return this->functions[function_name](script_args, args) == 0 ? SUCCESS : FAILED;
+        return this->functions->at(function_name)(script_args, args) == 0 ? SUCCESS : FAILED;
     }
 
     if(instruction.find("return") != instruction.end()) {
@@ -35,7 +35,7 @@ InstructionResult VirtualMachine::run_instruction(json instruction, vm_args_t& s
     return ERROR;
 }
 
-Event* VirtualMachine::run_script(json script, vm_args_t& args) {
+Event* VirtualMachine::run_script(const json& script, const vm_args_t& args) const {
     std::string name = script["name"];
     std::string version = script["version"];
     std::string author = script["author"];

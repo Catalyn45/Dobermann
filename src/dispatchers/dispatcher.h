@@ -8,11 +8,11 @@ class Engine;
 
 class Dispatcher {
     public:
-        Engine* engine;
+        const Engine* engine;
         const std::string name;
 
-        Dispatcher(Engine* engine, const std::string name);
-        virtual void dispatch(Event* event) = 0;
+        Dispatcher(const Engine* engine, const std::string& name);
+        virtual void dispatch(const Event* event) const = 0;
 
         virtual ~Dispatcher();
     protected:

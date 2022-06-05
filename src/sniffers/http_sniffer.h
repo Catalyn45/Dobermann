@@ -15,7 +15,7 @@ protected:
     void on_packet(const char* buffer, uint32_t length);
     int init();
 public:
-    HttpSniffer(Engine* engine, const std::string interface_name, uint16_t port);
+    HttpSniffer(const Engine* engine, const std::string& interface_name, uint16_t port);
     ~HttpSniffer();
 };
 

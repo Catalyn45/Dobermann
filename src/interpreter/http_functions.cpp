@@ -4,8 +4,8 @@
 #include <string>
 #include "../utils/packets.h"
 
-static int header_contains(vm_args_t& script_args, json args) {
-    HttpPacket* packet = (HttpPacket*)script_args["packet"];
+static int header_contains(const vm_args_t& script_args, const json& args) {
+    HttpPacket* packet = (HttpPacket*)script_args.at("packet");
     std::vector<std::string> tokens = args["tokens"];
 
     for (auto& token : tokens) {

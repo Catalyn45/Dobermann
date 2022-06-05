@@ -9,7 +9,7 @@ static Logger *logger = Logger::get_logger();
 
 ports_t PortScanSniffer::ports;
 
-PortScanSniffer::PortScanSniffer(Engine* engine, const std::string interface_name)
+PortScanSniffer::PortScanSniffer(const Engine* engine, const std::string& interface_name)
     : Sniffer(engine, "Portscan", interface_name, std::string("(tcp[tcpflags] & (tcp-syn) != 0) && (tcp[tcpflags] & (tcp-ack) == 0)")) {}
 
 

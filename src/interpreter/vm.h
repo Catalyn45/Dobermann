@@ -8,7 +8,7 @@ using json = nlohmann::json;
 
 using vm_args_t = std::map<std::string, void*>;
 
-using vm_function_t = int (*)(vm_args_t& script_args, json args);
+using vm_function_t = int (*)(const vm_args_t& script_args, const json& args);
 using vm_functions_t = std::map<std::string, vm_function_t>;
 
 enum InstructionResult {
@@ -20,14 +20,14 @@ enum InstructionResult {
 
 class VirtualMachine {
 private:
-    vm_functions_t functions;
+    const vm_functions_t* functions;
 
-    InstructionResult run_instruction(json instruction, vm_args_t& script_args, json* result);
+    InstructionResult run_instruction(const json& instruction, const vm_args_t& script_args, json* result) const;
 public:
     VirtualMachine();
 
-    int register_functions(vm_functions_t functions);
-    Event* run_script(json script, vm_args_t& args);
+    int register_functions(const vm_functions_t* functions);
+    Event* run_script(const json& script, const vm_args_t& args) const;
 
     ~VirtualMachine();
 };

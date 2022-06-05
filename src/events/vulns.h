@@ -9,9 +9,9 @@ using json = nlohmann::json;
 
 struct CVE: public Event{
     CVE();
-    CVE(std::string ip);
-    CVE(std::string ip, std::string id, std::string type, float score);
-    CVE(std::string id, std::string type, float score);
+    CVE(const std::string& ip);
+    CVE(const std::string& ip, const std::string& id, const std::string& type, float score);
+    CVE(const std::string& id, const std::string& type, float score);
     CVE(const CVE& other) = default;
     CVE(CVE&& other) = default;
 
@@ -19,27 +19,27 @@ struct CVE: public Event{
     std::string type;
     float score;
 
-    json serialize();
+    json serialize() const;
 };
 
 struct Portscan: public Event {
     Portscan();
-    Portscan(std::string ip);
+    Portscan(const std::string& ip);
 
     Portscan(const Portscan& other) = default;
     Portscan(Portscan&& other) = default;
 
-    json serialize();
+    json serialize() const;
 };
 
 struct Flood: public Event {
     Flood();
-    Flood(std::string ip);
+    Flood(const std::string& ip);
 
     Flood(const Flood& other) = default;
     Flood(Flood&& other) = default;
 
-    json serialize();
+    json serialize() const;
 };
 
 #endif // _VULNS_H_

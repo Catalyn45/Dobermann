@@ -8,10 +8,10 @@ static Logger* logger = Logger::get_logger();
 
 using json = nlohmann::json;
 
-JsonDispatcher::JsonDispatcher(Engine* engine, const std::string path)
-    : Dispatcher(engine, "Json dispatcher"), path(std::move(path)) {}
+JsonDispatcher::JsonDispatcher(const Engine* engine, const std::string& path)
+    : Dispatcher(engine, "Json dispatcher"), path(path) {}
 
-void JsonDispatcher::dispatch(Event* event) {
+void JsonDispatcher::dispatch(const Event* event) const {
     json j_event = event->serialize();
     logger->detection("detection type: %s from ip: %s",event->type_to_string().c_str(), event->ip.c_str());
 

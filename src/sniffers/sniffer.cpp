@@ -33,7 +33,7 @@ static void set_nonblocking(int sock) {
     }
 }
 
-Sniffer::Sniffer(Engine* engine, const std::string name, const std::string interface_name, const std::string filter)
+Sniffer::Sniffer(const Engine* engine, const std::string& name, const std::string& interface_name, const std::string& filter)
     : engine(engine), sock(-1), event(nullptr), name(name), interface_name(interface_name), filter(filter) {}
 
 static void read_callback(int socket, short what, void* arg) {
@@ -172,7 +172,7 @@ void Sniffer::stop() {
     event_del(this->event);
 }
 
-Sniffer* Sniffer::from_name(Engine* engine, const std::string interface_name, const std::string name, uint16_t port) {
+Sniffer* Sniffer::from_name(const Engine* engine, const std::string& interface_name, const std::string& name, uint16_t port) {
     if (name == "http") {
         return new HttpSniffer(engine, interface_name, port);
     }

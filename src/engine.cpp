@@ -5,7 +5,6 @@
 #include "sniffers/http_sniffer.h"
 #include "sniffers/portscan_sniffer.h"
 #include "sniffers/flood_sniffer.h"
-#include <sys/un.h>
 #include <unistd.h>
 #include "utils/utils.h"
 #include "dispatchers/json_dispatcher.h"
@@ -19,7 +18,7 @@ extern vm_functions_t http_functions_map;
 Engine::Engine()
     : vm() {
     this->base = event_base_new();
-    this->vm.register_functions(http_functions_map);
+    this->vm.register_functions(&http_functions_map);
 }
 
 Engine::~Engine() {
@@ -64,14 +63,14 @@ void Engine::register_dispatcher(Dispatcher* dispatcher) {
     Engine::dispatchers.push_back(dispatcher);
 }
 
-void Engine::dispatch(Event* event) {
+void Engine::dispatch(Event* event) const {
     for (Dispatcher* dispatcher : dispatchers) {
         logger->debug("dispatching event to dispatcher: %s", dispatcher->name.c_str());
         dispatcher->dispatch(event);
     }
 }
 
-int Engine::config(const std::string file_path) {
+int Engine::config(const std::string& file_path) {
     logger->info("configuring engine");
 
     std::ifstream file(file_path);
@@ -91,7 +90,6 @@ int Engine::config(const std::string file_path) {
         auto sniffers = config_item["sniffers"];
 
         for (const auto& interface: interfaces) {
-
             for (const auto& sniffer: sniffers) {
                 std::string name = sniffer["name"];
 

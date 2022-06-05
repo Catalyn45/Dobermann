@@ -15,16 +15,16 @@ enum EventType {
 
 class Event {
     public:
-        Event(EventType type, std::string ip);
+        Event(EventType type, const std::string& ip);
         Event(EventType type);
         virtual ~Event() {};
         EventType type;
         std::string ip;
-        virtual json serialize() = 0;
+        virtual json serialize() const = 0;
 
-        std::string type_to_string();
+        std::string type_to_string() const;
 
-        static Event* from_json(std::string type, json data);
+        static Event* from_json(const std::string& type, const json& data);
     private:
     protected:
 };

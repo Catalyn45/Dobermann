@@ -4,7 +4,7 @@
 #include "../utils/packets.h"
 #include "../utils/utils.h"
 
-FloodSniffer::FloodSniffer(Engine* engine, const std::string interface_name, uint16_t port)
+FloodSniffer::FloodSniffer(const Engine* engine, const std::string& interface_name, uint16_t port)
     : Sniffer(engine, "Flood", interface_name, std::string("(tcp[tcpflags] & (tcp-syn) != 0) && (tcp[tcpflags] & (tcp-ack) == 0) && dst port ") + std::to_string(port)), syn_ips() {}
 
 static Logger *logger = Logger::get_logger();

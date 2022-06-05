@@ -2,7 +2,7 @@
 #include "json_dispatcher.h"
 
 
-Dispatcher::Dispatcher(Engine* engine, const std::string name)
-    : engine(engine), name(std::move(name)) {}
+Dispatcher::Dispatcher(const Engine* engine, const std::string& name)
+    : engine(engine), name(name) {}
 
 Dispatcher::~Dispatcher() {}
