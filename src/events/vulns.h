@@ -42,4 +42,14 @@ struct Flood: public Event {
     json serialize() const;
 };
 
+struct PortProfiling: public Event {
+    PortProfiling();
+    PortProfiling(const std::string& ip);
+
+    PortProfiling(const PortProfiling& other) = default;
+    PortProfiling(PortProfiling&& other) = default;
+
+    json serialize() const;
+};
+
 #endif // _VULNS_H_

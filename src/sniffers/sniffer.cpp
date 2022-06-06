@@ -19,6 +19,7 @@
 #include "http_sniffer.h"
 #include "portscan_sniffer.h"
 #include "flood_sniffer.h"
+#include "profiling_sniffer.h"
 
 static Logger* logger = Logger::get_logger();
 
@@ -183,6 +184,10 @@ Sniffer* Sniffer::from_name(const Engine* engine, const std::string& interface_n
 
     if (name == "flood") {
         return new FloodSniffer(engine, interface_name, port);
+    }
+
+    if (name == "port_profiling") {
+        return new ProfilingSniffer(engine, interface_name, port);
     }
 
     return nullptr;

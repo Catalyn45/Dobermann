@@ -20,6 +20,8 @@ std::string Event::type_to_string() const {
             return std::string("Portscan");
         case EventType::FLOOD:
             return std::string("Flood");
+        case EventType::PORT_PROFILING:
+            return std::string("Port profiling");
         case EventType::SCAN:
             return std::string("Scan");
         case EventType::SPOOF:

@@ -45,3 +45,15 @@ json Flood::serialize() const {
     j["description"] = "Flood attempted";
     return j;
 }
+
+PortProfiling::PortProfiling()
+    : Event(EventType::PORT_PROFILING) {}
+
+PortProfiling::PortProfiling(const std::string& ip)
+    : Event(EventType::PORT_PROFILING, ip) {}
+
+json PortProfiling::serialize() const {
+    json j;
+    j["description"] = "Port profiling attempted";
+    return j;
+}
