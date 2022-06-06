@@ -20,13 +20,13 @@ enum InstructionResult {
 
 class VirtualMachine {
 private:
-    const vm_functions_t* functions;
+    vm_functions_t functions;
 
     InstructionResult run_instruction(const json& instruction, const vm_args_t& script_args, json* result) const;
 public:
     VirtualMachine();
 
-    int register_functions(const vm_functions_t* functions);
+    int register_functions(const vm_functions_t& functions);
     Event* run_script(const json& script, const vm_args_t& args) const;
 
     ~VirtualMachine();

@@ -8,17 +8,16 @@
 #include <unistd.h>
 #include "utils/utils.h"
 #include "dispatchers/json_dispatcher.h"
+#include "interpreter/vm_functions.h"
 
 using json = nlohmann::json;
 
 static Logger* logger = Logger::get_logger();
 
-extern vm_functions_t http_functions_map;
-
 Engine::Engine()
     : vm() {
     this->base = event_base_new();
-    this->vm.register_functions(&http_functions_map);
+    load_http_functions(&this->vm);
 }
 
 Engine::~Engine() {
