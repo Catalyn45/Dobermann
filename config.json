@@ -1,0 +1,19 @@
+{
+    "dispatch": "./output.json",
+    "configs": [
+        {
+            "interfaces": [
+                "lo"
+            ],
+            "sniffers": [
+                {
+                    "name": "http",
+                    "port": 3000
+                },
+                {
+                    "name": "portscan"
+                }
+            ]
+        }
+    ]
+}
