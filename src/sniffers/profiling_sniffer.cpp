@@ -14,8 +14,7 @@ static Logger* logger = Logger::get_logger();
 
 ProfilingSniffer::ProfilingSniffer(const Engine* engine, const std::string& interface_name, uint16_t port)
     : Sniffer(engine, "Profiling Sniffer", interface_name, std::string("(tcp || udp) && port ") + std::to_string(port)), services_count(0), last_service_sent_time(0), last_patterns() {
-    // this->repository = new LocalRepository("./profiling_patterns.json");
-    this->repository = new RemoteRepository("http://localhost:3000/profiling_patterns");
+    this->repository = new LocalRepository("./profiling_patterns.json");
 }
 
 ProfilingSniffer::~ProfilingSniffer() {

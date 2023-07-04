@@ -1,6 +1,3 @@
 *.o
 dobermann
-.vscode
 test_dobermann
-**/*.venv
-**/__pycache__
