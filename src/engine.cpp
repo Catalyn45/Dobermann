@@ -1,6 +1,7 @@
 #include "engine.h"
 #include "utils/logging.h"
 #include "nlohmann/json.hpp"
+#include <event2/event.h>
 #include <fstream>
 #include "sniffers/http_sniffer.h"
 #include "sniffers/portscan_sniffer.h"
