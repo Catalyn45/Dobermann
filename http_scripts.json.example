@@ -1,0 +1,72 @@
+[
+    {
+        "name": "demo_script",
+        "version": "1.0",
+        "type": "CVE",
+        "description": "Demo script to demonstrate the functionality",
+        "author": "Catalin Ancutei",
+        "steps": [
+            {
+                "not": {
+                    "function_pass": "http_method_is",
+                    "args": {
+                        "method": "GET"
+                    }
+                }
+            },
+            {
+                "or": [
+                    {
+                        "function_pass": "http_path_contains",
+                        "args": {
+                            "tokens": [
+                                "exec",
+                                "execv"
+                            ]
+                        }
+                    },
+                    {
+                        "function_pass": "http_body_contains",
+                        "args": {
+                            "tokens": [
+                                "echo"
+                            ]
+                        }
+                    }
+                ]
+            },
+            {
+                "return": {
+                    "id": "CVE-1234-56789",
+                    "type": "DIRECTORY_TRAVERSAL",
+                    "score": 5.3
+                }
+            }
+        ]
+    },
+    {
+        "name": "log4j",
+        "version": "1.0",
+        "type": "CVE",
+        "description": "Check if log4j is vulnerable to CVE-2021-44228",
+        "author": "Catalin Ancutei",
+        "steps": [
+            {
+                "function_pass": "http_packet_contains",
+                "args": {
+                    "tokens": [
+                        "${jndi:ldap",
+                        "${jndi:dns"
+                    ]
+                }
+            },
+            {
+                "return": {
+                    "id": "CVE-2021-44228",
+                    "type": "REMOTE_CODE_EXECUTION",
+                    "score": 9.4
+                }
+            }
+        ]
+    }
+]
